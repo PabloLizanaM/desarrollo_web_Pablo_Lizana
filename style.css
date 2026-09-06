@@ -286,4 +286,29 @@ footer {
     }
 }
 
+/* Estilos para el formulario de avistamientos */
+input[type="file"] {
+    padding: 0.5rem;
+    background-color: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+}
+
+textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
 /* Hecho con Gemini */

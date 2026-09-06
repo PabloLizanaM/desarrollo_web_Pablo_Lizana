@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportar Avistamiento - Avistamiento de Aves</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <h1>Reportar Avistamiento de Ave</h1>
+        <p>Los campos marcados con un asterisco (*) son obligatorios.</p>
+
+        <form id="form-avistamiento" action="#" method="post" enctype="multipart/form-data" novalidate>
+            <div class="campo">
+                <label for="nombre-ave">Especie u ave observada *</label>
+                <input type="text" id="nombre-ave" name="nombreAve" placeholder="Ej: Chincol, LOICA, Cóndor">
+                <span id="error-nombre-ave" class="mensaje-error">Ingrese un nombre de ave válido (mínimo 3 caracteres).</span>
+            </div>
+
+            <div class="campo">
+                <label for="cantidad-aves">Cantidad de ejemplares observados *</label>
+                <input type="number" id="cantidad-aves" name="cantidadAves" min="1" max="500" placeholder="Ej: 1">
+                <span id="error-cantidad" class="mensaje-error">Ingrese una cantidad válida (mínimo 1).</span>
+            </div>
+
+            <div class="campo">
+                <label for="fecha-avistamiento">Fecha del avistamiento *</label>
+                <input type="date" id="fecha-avistamiento" name="fechaAvistamiento">
+                <span id="error-fecha" class="mensaje-error">Ingrese una fecha válida (no puede ser futura).</span>
+            </div>
+
+            <div class="campo">
+                <label for="region-avistamiento">Región *</label>
+                <select id="region-avistamiento" name="regionAvistamiento">
+                    <option value="">Seleccione una región</option>
+                    <option value="Arica y Parinacota">Arica y Parinacota</option>
+                    <option value="Tarapacá">Tarapacá</option>
+                    <option value="Antofagasta">Antofagasta</option>
+                    <option value="Atacama">Atacama</option>
+                    <option value="Coquimbo">Coquimbo</option>
+                    <option value="Valparaíso">Valparaíso</option>
+                    <option value="Metropolitana de Santiago">Región Metropolitana de Santiago</option>
+                    <option value="Libertador General Bernardo O'Higgins">Región del Libertador General Bernardo O'Higgins</option>
+                    <option value="Maule">Región del Maule</option>
+                    <option value="Ñuble">Región de Ñuble</option>
+                    <option value="Biobío">Región del Biobío</option>
+                    <option value="La Araucanía">Región de La Araucanía</option>
+                    <option value="Los Ríos">Región de Los Ríos</option>
+                    <option value="Los Lagos">Región de Los Lagos</option>
+                    <option value="Aysén del General Carlos Ibáñez del Campo">Región de Aysén del General Carlos Ibáñez del Campo</option>
+                    <option value="Magallanes y de la Antártica Chilena">Región de Magallanes y de la Antártica Chilena</option>
+                </select>
+                <span id="error-region-avistamiento" class="mensaje-error">Por favor, seleccione una región.</span>
+            </div>
+
+            <div class="campo">
+                <label for="comuna-avistamiento">Comuna *</label>
+                <select id="comuna-avistamiento" name="comunaAvistamiento" disabled>
+                    <option value="">Seleccione una región primero</option>
+                </select>
+                <span id="error-comuna-avistamiento" class="mensaje-error">Por favor, seleccione una comuna.</span>
+            </div>
+
+            <div class="campo">
+                <label for="archivo-avistamiento">Evidencia fotográfica o video *</label>
+                <input type="file" id="archivo-avistamiento" name="archivoAvistamiento" accept="image/*,video/*">
+                <span id="error-archivo" class="mensaje-error">Debe adjuntar al menos un archivo de imagen o video.</span>
+            </div>
+
+            <div class="campo">
+            <label for="descripcion-avistamiento">Notas u observaciones del entorno</label>
+                <textarea id="descripcion-avistamiento" name="descripcionAvistamiento" rows="4" placeholder="Ej: Observado en copa de árbol cerca del río a primeras horas de la mañana."></textarea>
+            </div>
+
+            <div class="campo">
+                <button type="submit">Enviar Reporte de Avistamiento</button>
+            </div>
+        </form>
+    </main>
+
+    <footer>
+        <p>Unión de Ornitólogos de Chile - Prototipo Sistema Web</p>
+    </footer>
+
+    <script src="avistamiento.js"></script>
+</body>
+</html>
