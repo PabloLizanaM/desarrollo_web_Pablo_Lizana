@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segundo Registro - Avistamiento de Aves</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="main-registro2">
+        <h1>Gestión de Voluntarios</h1>
+
+        <div class="contenedor-dos-columnas">
+            <section class="columna-formulario">
+                <h2>Registrar Nuevo Voluntario</h2>
+                <form id="form-registro" action="#" method="post" novalidate>
+                    <div class="campo">
+                        <label for="nombre-voluntario">Nombre completo *</label>
+                        <input type="text" id="nombre-voluntario" name="nombre" placeholder="Ej: Juan Pérez">
+                        <span id="error-nombre" class="mensaje-error">Ingrese un nombre válido.</span>
+                    </div>
+
+                    <div class="campo">
+                        <label for="email-voluntario">Correo electrónico *</label>
+                        <input type="email" id="email-voluntario" name="email" placeholder="ejemplo@correo.cl">
+                        <span id="error-email" class="mensaje-error">Ingrese un correo válido.</span>
+                    </div>
+
+                    <div class="campo">
+                        <label for="telefono-voluntario">Teléfono móvil *</label>
+                        <input type="tel" id="telefono-voluntario" name="telefono" placeholder="+56912345678">
+                        <span id="error-telefono" class="mensaje-error">Ingrese un teléfono válido.</span>
+                    </div>
+
+                    <div class="campo">
+                        <label for="region-voluntario">Región *</label>
+                        <select id="region-voluntario" name="region">
+                            <option value="">Seleccione una región</option>
+                            <option value="Arica y Parinacota">Arica y Parinacota</option>
+                            <option value="Tarapacá">Tarapacá</option>
+                            <option value="Antofagasta">Antofagasta</option>
+                            <option value="Atacama">Atacama</option>
+                            <option value="Coquimbo">Coquimbo</option>
+                            <option value="Valparaíso">Valparaíso</option>
+                            <option value="Metropolitana de Santiago">Región Metropolitana de Santiago</option>
+                            <option value="Libertador General Bernardo O'Higgins">Región del Libertador General Bernardo O'Higgins</option>
+                            <option value="Maule">Región del Maule</option>
+                            <option value="Ñuble">Región de Ñuble</option>
+                            <option value="Biobío">Región del Biobío</option>
+                            <option value="La Araucanía">Región de La Araucanía</option>
+                            <option value="Los Ríos">Región de Los Ríos</option>
+                            <option value="Los Lagos">Región de Los Lagos</option>
+                            <option value="Aysén del General Carlos Ibáñez del Campo">Región de Aysén del General Carlos Ibáñez del Campo</option>
+                            <option value="Magallanes y de la Antártica Chilena">Región de Magallanes y de la Antártica Chilena</option>
+                        </select>
+                        <span id="error-region" class="mensaje-error">Seleccione una región.</span>
+                    </div>
+
+                    <div class="campo">
+                        <label for="comuna-voluntario">Comuna *</label>
+                        <select id="comuna-voluntario" name="comuna" disabled>
+                            <option value="">Seleccione una región primero</option>
+                        </select>
+                        <span id="error-comuna" class="mensaje-error">Seleccione una comuna.</span>
+                    </div>
+
+                    <button type="submit">Completar Registro</button>
+                </form>
+            </section>
+
+            <section class="columna-metricas">
+                <h2>Panel Estadístico</h2>
+                <p>Consulta el impacto territorial y los datos consolidados de la red antes o después de registrar nuevos usuarios.</p>
+        
+                <div class="tarjeta-acceso-metricas">
+                    <span class="icono-metricas">📈</span>
+                    <h3>Estadísticas y Métricas</h3>
+                    <p>Visualiza el total de voluntarios e informes por región.</p>
+                    <a href="metricas.html" class="boton-cta">Ver Métricas del Sistema</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>Unión de Ornitólogos de Chile - Prototipo Sistema Web</p>
+    </footer>
+
+    <script src="registro.js"></script>
+</body>
+</html>

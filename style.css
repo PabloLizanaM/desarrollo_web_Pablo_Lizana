@@ -231,4 +231,59 @@ footer {
     line-height: 1.4;
 }
 
+/* Estilos para el diseño de Registro 2 Columnas */
+.main-registro2 {
+    max-width: 950px; /* Ampliado para espacio de 2 columnas */
+}
+
+.contenedor-dos-columnas {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    align-items: flex-start;
+}
+
+.columna-formulario {
+    flex: 1.2;
+}
+
+.columna-metricas {
+    flex: 0.8;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.columna-metricas h2 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.tarjeta-acceso-metricas {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #ffffff;
+    border: 1px dashed #3498db;
+    border-radius: 6px;
+}
+
+.icono-metricas {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* Responsivo para móviles */
+@media (max-width: 768px) {
+    .contenedor-dos-columnas {
+        flex-direction: column;
+    }
+    .columna-metricas {
+        width: 100%;
+    }
+}
+
 /* Hecho con Gemini */
