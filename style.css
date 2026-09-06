@@ -1,0 +1,234 @@
+/* Reset básico y caja */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    color: #333333;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Encabezado y Navegación */
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover,
+nav a:focus {
+    background-color: #34495e;
+}
+
+/* Estructura Principal */
+main {
+    flex: 1;
+    max-width: 650px;
+    width: 90%;
+    margin: 2rem auto;
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+}
+
+main > p {
+    color: #666666;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+/* Campos de Formulario */
+.campo {
+    margin-bottom: 1.25rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #444444;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #ffffff;
+    transition: border-color 0.2s ease;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+select:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+/* Botón de Enviar */
+button[type="submit"] {
+    width: 100%;
+    padding: 0.85rem;
+    background-color: #27ae60;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #219150;
+}
+
+/* Manejo de Validaciones JS */
+.mensaje-error {
+    display: none;
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 0.35rem;
+    font-weight: 500;
+}
+
+.mensaje-error.visible {
+    display: block;
+}
+
+/* Sección Lista de Voluntarios */
+.contenedor-lista {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.contenedor-lista h2 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.voluntario-item {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.voluntario-item .nombre {
+    font-weight: bold;
+    color: #1a202c;
+}
+
+.voluntario-item .contacto,
+.voluntario-item .ubicacion {
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+
+/* Pie de Página */
+footer {
+    background-color: #ecf0f1;
+    text-align: center;
+    padding: 1rem;
+    margin-top: auto;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+/* Panel de bienvenida e index */
+.bienvenida {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.panel-acciones h2 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 1.25rem;
+    text-align: center;
+}
+
+.grid-botones-index {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+}
+
+.tarjeta-boton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: #ffffff;
+    border: 2px solid #e2e8f0;
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-boton:hover,
+.tarjeta-boton:focus {
+    transform: translateY(-3px);
+    border-color: #27ae60;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.icono-boton {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.tarjeta-boton h3 {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+}
+
+.tarjeta-boton p {
+    font-size: 0.85rem;
+    color: #666666;
+    line-height: 1.4;
+}
+
+/* Hecho con Gemini */

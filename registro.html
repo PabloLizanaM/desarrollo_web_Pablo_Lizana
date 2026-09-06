@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Voluntario - Avistamiento de Aves</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <main>
+        <h1>Registro de Voluntario(a)</h1>
+        <p>Los campos marcados con un asterisco (*) son obligatorios.</p>
+
+        <form id="form-registro" action="#" method="post" novalidate>
+        <div class="campo">
+            <label for="nombre-voluntario">Nombre completo *</label>
+            <input type="text" id="nombre-voluntario" name="nombre" placeholder="Ej: Juan Pérez">
+            <span id="error-nombre" class="mensaje-error">Por favor, ingrese un nombre válido (mínimo 3 caracteres).</span>
+        </div>
+
+        <div class="campo">
+            <label for="email-voluntario">Correo electrónico *</label>
+            <input type="email" id="email-voluntario" name="email" placeholder="ejemplo@correo.cl">
+            <span id="error-email" class="mensaje-error">Por favor, ingrese un correo electrónico válido.</span>
+        </div>
+
+        <div class="campo">
+            <label for="telefono-voluntario">Teléfono móvil *</label>
+            <input type="tel" id="telefono-voluntario" name="telefono" placeholder="+56912345678">
+            <span id="error-telefono" class="mensaje-error">Por favor, ingrese un número de teléfono válido (+56912345678).</span>
+        </div>
+
+        <div class="campo">
+            <label for="region-voluntario">Región *</label>
+            <select id="region-voluntario" name="region">
+                <option value="">Seleccione una región</option>
+                <option value="Arica y Parinacota">Arica y Parinacota</option>
+                <option value="Tarapacá">Tarapacá</option>
+                <option value="Antofagasta">Antofagasta</option>
+                <option value="Atacama">Atacama</option>
+                <option value="Coquimbo">Coquimbo</option>
+                <option value="Valparaíso">Valparaíso</option>
+                <option value="Metropolitana de Santiago">Región Metropolitana de Santiago</option>
+                <option value="Libertador General Bernardo O'Higgins">Región del Libertador General Bernardo O'Higgins</option>
+                <option value="Maule">Región del Maule</option>
+                <option value="Ñuble">Región de Ñuble</option>
+                <option value="Biobío">Región del Biobío</option>
+                <option value="La Araucanía">Región de La Araucanía</option>
+                <option value="Los Ríos">Región de Los Ríos</option>
+                <option value="Los Lagos">Región de Los Lagos</option>
+                <option value="Aysén del General Carlos Ibáñez del Campo">Región de Aysén del General Carlos Ibáñez del Campo</option>
+                <option value="Magallanes y de la Antártica Chilena">Región de Magallanes y de la Antártica Chilena</option>
+            </select>
+            <span id="error-region" class="mensaje-error">Por favor, seleccione una región.</span>
+        </div>
+
+        <div class="campo">
+            <label for="comuna-voluntario">Comuna *</label>
+            <select id="comuna-voluntario" name="comuna" disabled>
+                <option value="">Seleccione una región primero</option>
+            </select>
+            <span id="error-comuna" class="mensaje-error">Por favor, seleccione una comuna.</span>
+        </div>
+
+        <div class="campo">
+            <button type="submit">Completar Registro</button>
+        </div>
+        </form>
+
+    </main>
+
+    <footer>
+        <p>Unión de Ornitólogos de Chile - Prototipo Sistema Web</p>
+    </footer>
+
+    <script src="registro.js"></script>
+</body>
+</html>

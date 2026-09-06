@@ -25,4 +25,7 @@ Prototipo web para la Unión de Ornitólogos de Chile desarrollado con HTML, CSS
 * `README.md` - Documentación de entrega.
 
 
-### README desarrollado con gemini
+---
+<p align="center">
+  <sub>README desarrollado con Gemini</sub>
+</p>
