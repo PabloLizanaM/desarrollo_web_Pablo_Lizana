@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta Avistamientos - Avistamiento de Aves</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="main-consultas">
+        <h1>Historial de Avistamientos</h1>
+        <p>Consulta, filtra y ordena los avistamientos reportados por la comunidad.</p>
+
+        <div class="panel-controles">
+            <div class="control-grupo">
+                <label for="filtro-ave">Filtrar por tipo de ave:</label>
+                <input type="text" id="filtro-ave" placeholder="Ej: Chincol, Loica, Cóndor...">
+            </div>
+
+            <div class="control-grupo">
+                <label for="ordenar-por">Ordenar por:</label>
+                <select id="ordenar-por">
+                    <option value="fecha-desc">Fecha (más reciente primero)</option>
+                    <option value="fecha-asc">Fecha (más antigua primero)</option>
+                    <option value="lugar-asc">Lugar (A - Z)</option>
+                    <option value="lugar-desc">Lugar (Z - A)</option>
+                    <option value="ave-asc">Especie (A - Z)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="contenedor-tabla">
+            <table class="tabla-avistamientos">
+                <thead>
+                    <tr>
+                        <th>Especie</th>
+                        <th>Cantidad</th>
+                        <th>Fecha</th>
+                        <th>Ubicación</th>
+                        <th>Evidencia</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla-avistamientos">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="paginacion-contenedor">
+            <button id="btn-anterior" class="btn-paginacion">&laquo; Anterior</button>
+            <span id="info-pagina">Página 1 de 1</span>
+            <button id="btn-siguiente" class="btn-paginacion">Siguiente &raquo;</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>Unión de Ornitólogos de Chile - Prototipo Sistema Web</p>
+    </footer>
+
+    <script src="consultas.js"></script>
+</body>
+</html>
