@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métricas - Avistamiento de Aves</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Carga de Chart.js mediante CDN para renderizar los gráficos (idea Gemini) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <main class="main-metricas">
+        <h1>Métricas e Indicadores del Sistema</h1>
+        <p>Visualización gráfica sobre los voluntarios e indicadores de avistamientos registrados en el país.</p>
+
+        <section class="grid-resumen-metricas">
+            <div class="tarjeta-metrica">
+                <span class="numero-metrica">124</span>
+                <span class="label-metrica">Voluntarios Registrados</span>
+            </div>
+
+            <div class="tarjeta-metrica">
+                <span class="numero-metrica">358</span>
+                <span class="label-metrica">Avistamientos Reportados</span>
+            </div>
+
+            <div class="tarjeta-metrica">
+                <span class="numero-metrica">42</span>
+                <span class="label-metrica">Especies Distintas</span>
+            </div>
+
+            <div class="tarjeta-metrica">
+                <span class="numero-metrica">Metropolitana</span>
+                <span class="label-metrica">Región con Más Actividad</span>
+            </div>
+        </section>
+
+        <section class="contenedor-graficos">
+            <div class="tarjeta-grafico">
+                <h2>Avistamientos por Región</h2>
+                <div class="canvas-contenedor">
+                    <canvas id="chartAvistamientos"></canvas>
+                </div>
+            </div>
+
+            <div class="tarjeta-grafico">
+                <h2>Distribución de Voluntarios por Zona</h2>
+                <div class="canvas-contenedor">
+                    <canvas id="chartVoluntarios"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Unión de Ornitólogos de Chile - Prototipo Sistema Web</p>
+    </footer>
+
+    <script src="metricas.js"></script>
+</body>
+</html>

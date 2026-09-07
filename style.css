@@ -378,4 +378,82 @@ textarea:focus {
     color: #2c3e50;
 }
 
+/* Estilos para el panel de Métricas */
+.main-metricas {
+    max-width: 900px;
+}
+
+.grid-resumen-metricas {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Organiza las 4 tarjetas en 2 columnas fijas (2x2) */
+    gap: 1.25rem;
+    margin: 1.5rem 0 2.5rem 0;
+}
+
+.tarjeta-metrica {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-top: 4px solid #27ae60;
+    padding: 1.25rem 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.numero-metrica {
+    display: block;
+    font-size: 1.4rem; /* Se reduce de 1.8rem a 1.4rem para que textos largos quepan */
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+    overflow-wrap: break-word; /* Evita desbordamiento en pantallas pequeñas */
+}
+
+.label-metrica {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.seccion-desglose h2 {
+    font-size: 1.25rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+/* Contenedores de Gráficos */
+.contenedor-graficos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.tarjeta-grafico {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.tarjeta-grafico h2 {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.canvas-contenedor {
+    position: relative;
+    height: 280px;
+    width: 100%;
+}
+
+/* Opcional: Para pantallas móviles muy pequeñas pasa a 1 sola columna */
+@media (max-width: 500px) {
+    .grid-resumen-metricas {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Hecho con Gemini */
