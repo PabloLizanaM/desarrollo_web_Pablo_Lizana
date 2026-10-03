@@ -44,19 +44,36 @@ let errorComuna = document.getElementById('error-comuna');
 let listaVoluntarios = document.getElementById('lista-voluntarios');
 let totalVoluntarios = document.getElementById('total-voluntarios');
 
-regionSelect.addEventListener('change', () => {
-    let regionSeleccionada = regionSelect.value;
+regionSelect.addEventListener('change', async() => {
+    let regionId = regionSelect.value;
+
     comunaSelect.innerHTML = '<option value="">Seleccione una comuna</option>';
 
-    if (regionSeleccionada && comunasPorRegion[regionSeleccionada]) {
-        comunaSelect.disabled = false;
-        comunasPorRegion[regionSeleccionada].forEach(comuna => {
-            let option = document.createElement('option');
-            option.value = comuna;
-            option.textContent = comuna;
-            comunaSelect.appendChild(option);
-        });
-    } else {
+    if (!regionId) {
+        comunaSelect.disabled = true;
+        return;
+    }
+
+    try {
+        const response = await fetch(`/get_comunas/${regionId}`);
+        const data = await response.json();
+
+        if (data.comunas && data.comunas.length > 0) {
+            data.comunas.forEach(comuna => {
+                let option = document.createElement('option');
+                
+                // Si usas DictCursor en app.py:
+                option.value = comuna.id || comuna[0];
+                option.textContent = comuna.nombre || comuna[1];
+                
+                comunaSelect.appendChild(option);
+            });
+            comunaSelect.disabled = false;
+        } else {
+            comunaSelect.disabled = true;
+        }
+    } catch (error) {
+        console.error('Error al obtener comunas:', error);
         comunaSelect.disabled = true;
     }
 });

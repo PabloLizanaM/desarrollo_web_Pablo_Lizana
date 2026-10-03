@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Voluntario - Avistamiento de Aves</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
@@ -26,13 +26,13 @@
                 <p>¿Qué deseas hacer a continuación?</p>
                 
                 <div class="grid-botones-index">
-                    <a href={{ url_for('avistamiento') }} class="tarjeta-boton">
+                    <a href="{{ url_for('avistamiento') }}" class="tarjeta-boton">
                         <span class="icono-boton">🦜</span>
                         <h3>Registrar Avistamiento</h3>
                         <p>Registra un nuevo avistamiento de aves</p>
                     </a>
 
-                    <a href={{ url_for('index') }} class="tarjeta-boton">
+                    <a href="{{ url_for('index') }}" class="tarjeta-boton">
                         <span class="icono-boton">🏠</span>
                         <h3>Volver al Inicio</h3>
                         <p>Regresa a la página principal</p>
@@ -65,7 +65,7 @@
             <select id="region-voluntario" name="region" required>
                 <option value="">Seleccione una región</option>
                 {% for region in regiones %}
-                    <option value="{{ region.id }}">{{ region.nombre }}</option>
+                    <option value="{{ region[0] }}">{{ region[1] }}</option>
                 {% endfor %}
             </select>
             <span id="error-region" class="mensaje-error">Por favor, seleccione una región.</span>
@@ -91,6 +91,6 @@
         <p>Unión de Ornitólogos de Chile - Prototipo Sistema Web</p>
     </footer>
 
-    <script src="{{ url_for('static', filename='registro.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/registro.js') }}"></script>
 </body>
 </html>

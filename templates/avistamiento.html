@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reportar Avistamiento - Avistamiento de Aves</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <main>
@@ -17,7 +17,7 @@
                 <select id="voluntario-id" name="voluntario_id" required>
                     <option value="">Seleccione un voluntario</option>
                     {% for vol in voluntarios %}
-                        <option value="{{ vol.id }}">{{ vol.nombre }}</option>
+                        <option value="{{ vol[0] }}">{{ vol[1] }}</option>
                     {% endfor %}
                 </select>
                 <span id="error-voluntario" class="mensaje-error">Debe seleccionar un voluntario.</span>
@@ -28,7 +28,7 @@
                 <select id="nombre-ave" name="nombreAve" required>
                     <option value="">Seleccione un ave</option>
                     {% for ave in aves %}
-                        <option value="{{ ave.id }}">{{ ave.nombre }}</option>
+                        <option value="{{ ave[0] }}">{{ ave[1] }}</option>
                     {% endfor %}
                 </select>
                 <span id="error-nombre-ave" class="mensaje-error">Por favor, seleccione un ave.</span>
@@ -51,7 +51,7 @@
                 <select id="region-avistamiento" name="regionAvistamiento" required>
                     <option value="">Seleccione una región</option>
                     {% for reg in regiones %}
-                        <option value="{{ reg.id }}">{{ reg.nombre }}</option>
+                        <option value="{{ reg[0] }}">{{ reg[1] }}</option>
                     {% endfor %}
                 </select>
                 <span id="error-region-avistamiento" class="mensaje-error">Por favor, seleccione una región.</span>
