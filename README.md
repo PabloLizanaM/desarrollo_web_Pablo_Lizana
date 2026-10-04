@@ -43,6 +43,9 @@ Aplicación web desarrollada con Python (Flask) y MySQL para la gestión de volu
 
 ---
 
+### NO OLVIDAR CAMBIAR CONTRASEÑA
+
+---
 
 <p align="center">
   <sub>README desarrollado con Gemini</sub>
