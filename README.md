@@ -1,7 +1,12 @@
 # Sistema de Gestión de Avistamientos de Aves - Tarea 2
 
 **Autor:** Pablo Lizana  
-**Curso:** Desarrollo Web  
+**Curso:** Desarrollo Web 
+
+## Descripción
+Aplicación web desarrollada con Python (Flask) y MySQL para la gestión de voluntarios, reporte de avistamientos de aves y visualización de consultas y estadísticas para la Unión de Ornitólogos de Chile.
+
+---
 
 ### 1. Arquitectura y Persistencia (Flask-SQLAlchemy + PyMySQL)
 * **Conexión e Integración:** Se utilizó **Flask-SQLAlchemy** junto con la extensión `pymysql` para administrar las sesiones y transacciones con la base de datos MySQL.
