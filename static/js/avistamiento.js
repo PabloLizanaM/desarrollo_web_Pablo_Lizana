@@ -17,16 +17,13 @@ const comunasPorRegion = {
     "Magallanes y de la Antártica Chilena": ["Punta Arenas", "Puerto Natales", "Porvenir", "Cabo de Hornos"]
 };
 
-const validarNombreAve = (nombre) => {
-    if (!nombre || nombre.trim().length < 3) return false;
-    const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/;
-    return regexNombre.test(nombre.trim());
-};
-
+const validarVoluntario = (voluntario) => voluntario !== "";
+const validarNombreAve = (nombre) => nombre !== "";
+/*
 const validarCantidad = (cantidad) => {
     const num = Number(cantidad);
     return cantidad && !isNaN(num) && num >= 1 && num <= 500;
-};
+};*/
 
 const validarFecha = (fecha) => {
     if (!fecha) return false;
@@ -36,8 +33,15 @@ const validarFecha = (fecha) => {
     return fechaSeleccionada <= hoy;
 };
 
+const validarHora = (hora) => {
+    if (!hora) return false;
+    const [horas, minutos] = hora.split(':').map(Number);
+    return horas >= 0 && horas < 24 && minutos >= 0 && minutos < 60;
+}
+
 const validarRegion = (region) => region !== "";
 const validarComuna = (comuna) => comuna !== "";
+
 const validarArchivo = (archivoInput) => {
     if (!archivoInput.files || archivoInput.files.length === 0) return false;
 
@@ -51,16 +55,20 @@ const validarArchivo = (archivoInput) => {
 };
 
 let form = document.getElementById('form-avistamiento');
+let voluntarioSelect = document.getElementById('voluntario-id');
 let nombreAveInput = document.getElementById('nombre-ave');
-let cantidadInput = document.getElementById('cantidad-aves');
+//let cantidadInput = document.getElementById('cantidad-aves');
 let fechaInput = document.getElementById('fecha-avistamiento');
+let horaInput = document.getElementById('hora-avistamiento');
 let regionSelect = document.getElementById('region-avistamiento');
 let comunaSelect = document.getElementById('comuna-avistamiento');
 let archivoInput = document.getElementById('archivo-avistamiento');
 
+let errorVoluntario = document.getElementById('error-voluntario');
 let errorNombreAve = document.getElementById('error-nombre-ave');
-let errorCantidad = document.getElementById('error-cantidad');
+//let errorCantidad = document.getElementById('error-cantidad');
 let errorFecha = document.getElementById('error-fecha');
+let errorHora = document.getElementById('error-hora');
 let errorRegion = document.getElementById('error-region-avistamiento');
 let errorComuna = document.getElementById('error-comuna-avistamiento');
 let errorArchivo = document.getElementById('error-archivo');
@@ -103,9 +111,16 @@ regionSelect.addEventListener('change', async() => {
 });
 
 form.addEventListener('submit', (event) => {
-    event.preventDefault();
-
     let esValido = true;
+
+    if (!validarVoluntario(voluntarioSelect.value)) {
+        esValido = false;
+        voluntarioSelect.style.borderColor = 'red';
+        if (errorVoluntario) errorVoluntario.classList.add('visible');
+    } else {
+        voluntarioSelect.style.borderColor = '';
+        if (errorVoluntario) errorVoluntario.classList.remove('visible');
+    }
 
     if (!validarNombreAve(nombreAveInput.value)) {
         esValido = false;
@@ -116,6 +131,7 @@ form.addEventListener('submit', (event) => {
         errorNombreAve.classList.remove('visible');
     }
 
+/*
     if (!validarCantidad(cantidadInput.value)) {
         esValido = false;
         cantidadInput.style.borderColor = 'red';
@@ -124,6 +140,7 @@ form.addEventListener('submit', (event) => {
         cantidadInput.style.borderColor = '';
         errorCantidad.classList.remove('visible');
     }
+*/
 
     if (!validarFecha(fechaInput.value)) {
         esValido = false;
@@ -132,6 +149,15 @@ form.addEventListener('submit', (event) => {
     } else {
         fechaInput.style.borderColor = '';
         errorFecha.classList.remove('visible');
+    }
+
+    if (!validarHora(horaInput.value)) {
+        esValido = false;
+        horaInput.style.borderColor = 'red';
+        errorHora.classList.add('visible');
+    } else {
+        horaInput.style.borderColor = '';
+        errorHora.classList.remove('visible');
     }
 
     if (!validarRegion(regionSelect.value)) {
@@ -161,6 +187,11 @@ form.addEventListener('submit', (event) => {
         errorArchivo.classList.remove('visible');
     }
 
+    if (!esValido) {
+        event.preventDefault();
+    }
+
+    /*
     if (esValido) {
         if (listaAvistamientos) {
             let item = document.createElement('div');
@@ -194,5 +225,5 @@ form.addEventListener('submit', (event) => {
 
         alert('Reporte de avistamiento ingresado correctamente.');
         window.location.href = 'index.html';
-    }
+    }*/
 });

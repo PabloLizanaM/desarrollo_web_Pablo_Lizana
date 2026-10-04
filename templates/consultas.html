@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consulta Avistamientos - Avistamiento de Aves</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <main class="main-consultas">
@@ -34,8 +34,7 @@
                 <thead>
                     <tr>
                         <th>Especie</th>
-                        <th>Cantidad</th>
-                        <th>Fecha</th>
+                        <th>Fecha y hora</th>
                         <th>Ubicación</th>
                         <th>Evidencia</th>
                     </tr>
@@ -52,10 +51,27 @@
         </div>
     </main>
 
+    <div id ="modal-detalle" class="modal">
+        <div class="modal-contenido">
+            <span class="cerrar-modal" id="cerrar-modal">&times;</span>
+            <h2 id="modal-ave-nombre">Detalle del Avistamiento</h2>
+            <p><strong>Voluntario:</strong> <span id="modal-voluntario"></span></p>
+            <p><strong>Fecha/Hora:</strong> <span id="modal-fecha"></span></p>
+            <p><strong>Ubicación:</strong> <span id="modal-ubicacion"></span></p>
+            <p><strong>Descripción:</strong> <span id="modal-descripcion"></span></p>
+            <h3>Archivos Adjuntos</h3>
+            <div id="modal-galeria" class="galeria-archivos"></div>
+        </div>
+    </div>
+
     <footer>
         <p>Unión de Ornitólogos de Chile - Prototipo Sistema Web</p>
     </footer>
 
-    <script src="consultas.js"></script>
+    <script>
+        const datosAvistamientos = {{ avistamientos | tojson }};
+    </script>
+
+    <script src="{{ url_for('static', filename='js/consultas.js') }}"></script>
 </body>
 </html>

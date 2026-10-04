@@ -11,13 +11,15 @@
         <h1>Reportar Avistamiento de Ave</h1>
         <p>Los campos marcados con un asterisco (*) son obligatorios.</p>
 
-        <form id="form-avistamiento" action="#" method="post" enctype="multipart/form-data" novalidate>
+        <form id="form-avistamiento" action="{{ url_for('avistamiento') }}" method="post" enctype="multipart/form-data" novalidate>
             <div class="campo">
                 <label for="voluntario-id">Voluntario(a) que reporta *</label>
                 <select id="voluntario-id" name="voluntario_id" required>
                     <option value="">Seleccione un voluntario</option>
-                    {% for vol in voluntarios %}
-                        <option value="{{ vol[0] }}">{{ vol[1] }}</option>
+                        {% for vol in voluntarios %}
+                        <option value="{{ vol[0] }}" {% if voluntario_seleccionado|string == vol[0]|string %}selected{% endif %}>
+                        {{ vol[1] }}
+                    </option>
                     {% endfor %}
                 </select>
                 <span id="error-voluntario" class="mensaje-error">Debe seleccionar un voluntario.</span>

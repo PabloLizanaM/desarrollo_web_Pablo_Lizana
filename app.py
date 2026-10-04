@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import request, render_template
+from flask import request, render_template, redirect, url_for, jsonify
 import pymysql
 from datetime import datetime
 import os
@@ -29,12 +29,16 @@ def getConnection():
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    c =getConnection()
+    ultimos_avistamientos = get_ultimos_avistamientos(c)
+    c.close()
+    return render_template('index.html', ultimos_avistamientos=ultimos_avistamientos)
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     errors = [] 
     message = None
+    voluntario_id = None
     
     if request.method == 'POST':
         nombre = request.form.get('nombre', '').strip()
@@ -59,7 +63,9 @@ def registro():
             
             fecha_registro = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             
-            if agregar_usuario_db(c, nombre, email, telefono, fecha_registro, comuna_id):
+            voluntario_id = agregar_usuario_db(c, nombre, email, telefono, fecha_registro, comuna_id)
+            
+            if voluntario_id:
                 message = "Usuario agregado exitosamente"
             else:
                 errors.append("Error al agregar el usuario. Verifica los datos ingresados.")
@@ -73,7 +79,8 @@ def registro():
         'registro.html', 
         errors=errors, 
         message=message, 
-        regiones=regiones
+        regiones=regiones,
+        voluntario_id=voluntario_id
     )
 
 @app.route('/avistamiento', methods=['POST', 'GET'])
@@ -82,6 +89,7 @@ def avistamiento():
     message = None
     c = getConnection()
     fecha_hoy = datetime.now().strftime('%Y-%m-%d')
+    voluntario_seleccionado = request.args.get('voluntario_id') or request.form.get('voluntario_id', '').strip()
     
     if request.method == 'POST':
         voluntario_id = request.form.get('voluntario_id', '').strip()
@@ -132,6 +140,8 @@ def avistamiento():
                 
                 if agregar_avistamiento_db(c, voluntario_id, ave_id, comuna_id, dia_hora, comentario, archivos_guardados):
                     message = "Avistamiento agregado exitosamente"
+                    c.close()
+                    return redirect(url_for('index'))
                 else:
                     errors.append("Error al agregar el avistamiento. Verifica los datos ingresados.")
             else:
@@ -152,7 +162,8 @@ def avistamiento():
         errors=errors,
         message=message,
         fecha_minima=fecha_minima,
-        fecha_hoy=fecha_hoy
+        fecha_hoy=fecha_hoy,
+        voluntario_seleccionado=voluntario_seleccionado
     )
 
 @app.route('/consulta', methods=['GET'])
@@ -160,7 +171,39 @@ def consulta():
     c = getConnection()
     avistamientos = get_avistamientos(c)
     c.close()
-    return render_template('consulta.html', avistamientos=avistamientos)
+    return render_template('consultas.html', avistamientos=avistamientos)
+
+@app.route('/consulta/<int:avistamiento_id>', methods=['GET'])
+def detalle_avistamiento(avistamiento_id):
+    c = getConnection()
+    cursor = c.cursor(pymysql.cursors.DictCursor)
+    
+    sql = """
+        SELECT a.id, a.fecha_hora, a.descripcion,
+            ave.nombre AS ave_nombre,
+            com.nombre AS comuna_nombre,
+            reg.nombre AS region_nombre,
+            vol.nombre AS voluntario_nombre
+        FROM avistamiento a
+        JOIN ave ON a.ave_id = ave.id
+        JOIN comuna com ON a.lugar = com.id
+        JOIN region reg ON com.region_id = reg.id
+        JOIN voluntario vol ON a.voluntario_id = vol.id
+        WHERE a.id = %s
+    """
+    cursor.execute(sql, (avistamiento_id,))
+    avistamiento = cursor.fetchone()
+    
+    if avistamiento:
+        if isinstance(avistamiento['fecha_hora'], datetime):
+            avistamiento['fecha_hora'] = avistamiento['fecha_hora'].strftime('%Y-%m-%d %H:%M:%S')
+        
+        sql_archivos = "SELECT ruta_archivo, nombre_archivo FROM registro WHERE avistamiento_id = %s"
+        cursor.execute(sql_archivos, (avistamiento_id,))
+        avistamiento['archivos'] = cursor.fetchall()
+        
+    c.close()
+    return jsonify(avistamiento or {})
 
 @app.route('/metricas', methods=['POST'])
 def metricas():
@@ -179,6 +222,24 @@ def get_comunas_por_region(region_id):
     c.close()
     return {"comunas": comunas}
 
+def get_ultimos_avistamientos(c):
+    sql = """
+        SELECT a.id, a.fecha_hora, ave.nombre AS ave_nombre, com.nombre AS comuna_nombre,
+                (SELECT CONCAT(r.ruta_archivo, r.nombre_archivo) 
+                FROM registro r 
+                WHERE r.avistamiento_id = a.id 
+                LIMIT 1) AS foto
+        FROM avistamiento a
+        JOIN ave ON a.ave_id = ave.id
+        JOIN voluntario v ON a.voluntario_id = v.id
+        JOIN comuna com ON a.lugar = com.id
+        ORDER BY a.id DESC
+        LIMIT 2
+    """
+    cursor = c.cursor()
+    cursor.execute(sql)
+    return cursor.fetchall()
+
 def agregar_usuario_db(c, nombre, email, telefono, fecha_registro, comuna_id):
     try:
         sql = """INSERT INTO voluntario (nombre, email, telefono, fecha_registro, comuna_id) 
@@ -186,19 +247,19 @@ def agregar_usuario_db(c, nombre, email, telefono, fecha_registro, comuna_id):
         cursor = c.cursor()
         cursor.execute(sql, (nombre, email, telefono, fecha_registro, comuna_id))
         c.commit()
-        return True
+        return cursor.lastrowid
     
     except pymysql.Error as e:
         c.rollback()
         app.logger.error("Error con base de datos: {0} {1} ".format(e.args[0], e.args[1]))
-        return False
+        return None
 
 def agregar_avistamiento_db(c, voluntario_id, ave_id, comuna_id, dia_hora, comentario, archivos):
     try:
-        sql = """INSERT INTO avistamiento (voluntario_id, ave_id, comuna_id, fecha_hora, comentario) 
+        sql = """INSERT INTO avistamiento (voluntario_id, ave_id, fecha_hora, lugar, descripcion) 
         VALUES (%s, %s, %s, %s, %s)"""
         cursor = c.cursor()
-        cursor.execute(sql, (voluntario_id, ave_id, comuna_id, dia_hora, comentario))
+        cursor.execute(sql, (voluntario_id, ave_id, dia_hora, comuna_id, comentario))
         avistamiento_id = cursor.lastrowid
         
         sql_archivo = "INSERT INTO registro (ruta_archivo, nombre_archivo, avistamiento_id) VALUES (%s, %s, %s)"
@@ -242,6 +303,26 @@ def get_regiones(c):
     regiones = cursor.fetchall()
     return regiones
 
+def get_avistamientos(c):
+    sql = """
+        SELECT a.id, a.fecha_hora,
+                ave.nombre AS ave_nombre, 
+                com.nombre AS comuna_nombre,
+                (SELECT COUNT(*) FROM registro r WHERE r.avistamiento_id = a.id) AS cantidad_archivos
+        FROM avistamiento a
+        JOIN ave ON a.ave_id = ave.id
+        JOIN comuna com ON a.lugar = com.id
+        ORDER BY a.id DESC
+    """
+    cursor = c.cursor(pymysql.cursors.DictCursor)
+    cursor.execute(sql)
+    
+    resultados = cursor.fetchall()
+    for resultado in resultados:
+        if isinstance(resultado['fecha_hora'], datetime):
+            resultado['fecha_hora'] = resultado['fecha_hora'].strftime('%Y-%m-%d %H:%M:%S')
+            
+    return resultados
 
 
 if __name__ == "__main__":

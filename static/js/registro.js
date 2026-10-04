@@ -79,7 +79,6 @@ regionSelect.addEventListener('change', async() => {
 });
 
 form.addEventListener('submit', (event) => {
-    event.preventDefault();
 
     let esValido = true;
 
@@ -128,6 +127,11 @@ form.addEventListener('submit', (event) => {
         errorComuna.classList.remove('visible');
     }
 
+    if (!esValido) {
+        event.preventDefault();
+    }
+
+    /*
     if (esValido) {
 
         if (listaVoluntarios) {
@@ -157,10 +161,6 @@ form.addEventListener('submit', (event) => {
             }
         }
 
-        form.reset();
-        comunaSelect.disabled = true;
 
-        alert('Voluntario(a) registrado(a) correctamente.');
-        window.location.href = 'index.html';
-    }
+    }*/
 });

@@ -456,4 +456,62 @@ textarea:focus {
     }
 }
 
+/* Estilos para Modal de Detalle de Avistamientos */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-contenido {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.cerrar-modal {
+    position: absolute;
+    right: 1.25rem;
+    top: 0.75rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #666666;
+    cursor: pointer;
+}
+
+.cerrar-modal:hover {
+    color: #000000;
+}
+
+.galeria-archivos img,
+.galeria-archivos video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin-top: 0.75rem;
+    border: 1px solid #e2e8f0;
+}
+
+.fila-avistamiento {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.fila-avistamiento:hover {
+    background-color: #f1f5f9;
+}
+
 /* Hecho con Gemini */

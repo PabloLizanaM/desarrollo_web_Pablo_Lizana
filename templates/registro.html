@@ -26,7 +26,7 @@
                 <p>¿Qué deseas hacer a continuación?</p>
                 
                 <div class="grid-botones-index">
-                    <a href="{{ url_for('avistamiento') }}" class="tarjeta-boton">
+                    <a href="{{ url_for('avistamiento', voluntario_id=voluntario_id) }}" class="tarjeta-boton">
                         <span class="icono-boton">🦜</span>
                         <h3>Registrar Avistamiento</h3>
                         <p>Registra un nuevo avistamiento de aves</p>
@@ -36,12 +36,13 @@
                         <span class="icono-boton">🏠</span>
                         <h3>Volver al Inicio</h3>
                         <p>Regresa a la página principal</p>
+                    </a>
                 </div>
             </section>
         {% endif %}
 
         {% if not message %}
-        <form id="form-registro" action="#" method="post" novalidate>
+        <form id="form-registro" action="{{ url_for('registro') }}" method="post" novalidate>
         <div class="campo">
             <label for="nombre-voluntario">Nombre completo *</label>
             <input type="text" id="nombre-voluntario" name="nombre" placeholder="Ej: Juan Pérez">

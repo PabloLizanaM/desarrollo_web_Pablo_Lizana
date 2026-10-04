@@ -13,7 +13,7 @@
             <p>Gracias por participar en la Red de Avistamiento de Aves. Desde este panel principal puedes acceder a la gestión de avistamientos, consultar el historial registrado o analizar las estadísticas globales de la plataforma.</p>
         </section>
 
-        <section class="panel-acciones">
+        <nav class="panel-acciones">
             <h2>¿Qué deseas hacer hoy?</h2>
 
             <div class="grid-botones-index">
@@ -24,15 +24,15 @@
                 </a>
 
                 <a href="{{url_for('consulta')}}" class="tarjeta-boton">
-                <span class="icono-boton">📋</span>
-                <h3>Listado de Avistamientos</h3>
-                <p>Consulta y explora el registro histórico de aves observadas.</p>
+                <span class="icono-boton">🔍</span>
+                <h3>Consultar Lista de Avistamientos</h3>
+                <p>Busca y visualiza avistamientos registrados.</p>
                 </a>
 
                 <a href="{{url_for('metricas')}}" class="tarjeta-boton">
                 <span class="icono-boton">📊</span>
                 <h3>Métricas y Voluntarios</h3>
-                <p>Revisa las estadísticas generales y el listado de la comunidad.</p>
+                <p>En Desarrollo</p>
                 </a>
 
                 <a href="{{url_for('registro')}}" class="tarjeta-boton">
@@ -41,6 +41,28 @@
                 <p>Accede al panel interactivo con registro dinámico y consulta directa de métricas.</p>
                 </a>
             </div>
+        </nav>
+
+        <section class="ultimos-avistamientos">
+            <h2>Últimos 2 Avistamientos Registrados</h2>
+            {% if ultimos_avistamientos %}
+                <div class="grid-ultimos">
+                    {% for ave in ultimos_avistamientos %}
+                        <div class="tarjeta-avistamiento">
+                            {% if ave[4] %}
+                                <img src="{{ url_for('static', filename=ave[4]) }}" alt="{{ ave[2] }}" width="150">
+                            {% endif %}
+                            <div>
+                                <h3>{{ ave[2] }}</h3>
+                                <p><strong>Fecha/Hora:</strong> {{ ave[1] }}</p>
+                                <p><strong>Comuna:</strong> {{ ave[3] }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No hay avistamientos registrados aún.</p>
+            {% endif %}
         </section>
     </main>
 
