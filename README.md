@@ -1,55 +1,49 @@
-# Sistema de Gestión de Avistamientos de Aves - Tarea 1
+# Sistema de Gestión de Avistamientos de Aves - Tarea 2
 
 **Autor:** Pablo Lizana  
 **Curso:** Desarrollo Web  
 
 ## Descripción
-Prototipo web para la Unión de Ornitólogos de Chile desarrollado con HTML5, CSS3 y JavaScript para la gestión de voluntarios y el reporte de avistamientos de aves en el territorio nacional.
+Aplicación web desarrollada con Python (Flask) y MySQL para la gestión de voluntarios, reporte de avistamientos de aves y despliegue de estadísticas para la Unión de Ornitólogos de Chile.
+
+---
 
 ## Decisiones de Diseño e Implementación
 
-* **Navegación y Estructura Modular:**
-  - `index.html`: Panel de bienvenida y acceso rápido a los módulos del sistema.
-  - `registro.html` / `registro2.html`: Formulario estándar e interfaz avanzada en dos columnas para la inscripción de voluntarios.
-  - `avistamiento.html`: Formulario de reporte de avistamientos con soporte multimedia.
-  - `consultas.html`: Tabla dinámica interactiva de avistamientos.
-  - `metricas.html`: Dashboard con indicadores clave y gráficos estadísticos.
+### 1. Arquitectura y Persistencia (Backend)
+* **Conexión a Base de Datos:** Se utilizó `pymysql` para la interacción con la base de datos `tarea2`. La gestión de conexiones se centralizó en la función `getConnection()` para asegurar la correcta liberación de recursos (`c.close()`) en cada endpoint.
+* **Manejo de Transacciones:** En las inserciones complejas (como `agregar_avistamiento_db`), se emplean consultas parametrizadas (`%s`) para **prevenir inyecciones SQL**. En caso de fallo durante el guardado de archivos o registros asociados, se ejecuta `c.rollback()` asegurando integridad referencial.
 
-* **Validaciones Robustas en Cliente:**
-  - **Expresiones Regulares (RegEx):** Validación estricta de nombres (mínimo 3 caracteres), correo electrónico y teléfono con formato chileno (`+569...`).
-  - **Límite Temporal de Fechas:** La fecha de avistamiento previene la selección de días futuros ajustando la hora límite al final del día actual (`23:59:59.999`).
-  - **Evidencia Multimedia:** Verificación obligatoria de archivos (imágenes/video) combinando el atributo HTML `accept` con comprobaciones programáticas en JS.
-  - **Anidación Región/Comuna:** Filtro dinámico de comunas dependiente de la región seleccionada.
+### 2. Carga y Servido de Archivos Multimedia (Uploads)
+* **Subida de Archivos:** Los archivos multimedia subidos en el reporte de avistamiento se sanitizan mediante `secure_filename` de Werkzeug y se renombran agregando un *timestamp* para evitar colisiones de nombres.
+* **Estructura de Rutas Estáticas:** Los archivos se guardan en el directorio `static/uploads/`. En la tabla `registro` de la base de datos se almacena la ruta relativa `uploads/` y el nombre asignado al archivo.
+* **Visualización Dinámica:** En las vistas dinámicas (como el modal de detalle en `consultas.html`), JavaScript consulta el endpoint de Flask (`/consulta/<id>`) e inyecta la URL `/static/uploads/...` asegurando la correcta carga de imágenes y videos.
 
-* **Móduo de Consultas (`consultas.js`):**
-  - **Filtrado:** Búsqueda en tiempo real por tipo/especie de ave.
-  - **Ordenamiento:** Selección de criterios cronológicos (fechas ascendente/descendente) y alfabéticos (ubicación o especie).
-  - **Paginación:** División en memoria de resultados por páginas configurables con botones de navegación (`Anterior` / `Siguiente`).
+### 3. Validaciones y Seguridad (XSS)
+* **Validación en Cliente y Servidor:** Todos los campos del formulario de avistamientos y registros cuentan con doble validación (JavaScript en el cliente y validaciones estrictas en las rutas POST de Flask).
+* **Manejo de Comentarios y Entradas de Texto:** Para prevenir vulnerabilidades XSS (Cross-Site Scripting) derivadas de scripts ingresados en el campo de observaciones/comentarios:
+  - En las plantillas HTML se aprovecha el renderizado predeterminado con auto-escape de Jinja2 (`{{ ... }}`).
+  - En las peticiones dinámicas de JavaScript (`consultas.js`), se utiliza la propiedad `.textContent` para la inserción de texto en el DOM, garantizando que cualquier etiqueta o script sea tratado como texto plano sin ejecutarse.
 
-* **Visualización de Métricas (`metricas.js`):**
-  - **KPIs Resumen:** Disposición en cuadrícula `2x2` responsive para los indicadores principales del sistema.
-  - **Gráficos Interactivos:** Integración de la librería Chart.js (vía CDN) para renderizar un gráfico de barras (avistamientos por región) y un gráfico de dona (distribución de voluntarios por zona).
+### 4. Consultas y Endpoints Dinámicos
+* **Carga Asíncrona de Comunas:** El selector de comunas depende de la región mediante una petición `fetch` al endpoint `/get_comunas/<region_id>`, optimizando la carga inicial de la página.
+* **Detalle de Avistamiento:** El endpoint `/consulta/<int:avistamiento_id>` entrega un objeto JSON estructurado con los datos del avistamiento y la lista de archivos asociados recuperados de la tabla `registro`.
 
-* **Seguridad y Persistencia:**
-  - Operación 100% del lado del cliente en cumplimiento con los requerimientos del prototipo (sin backend ni persistencia en `localStorage`).
-  - Inyección segura de datos en el DOM mediante `textContent` para mitigar riesgos de inyección XSS.
+---
 
 ## Estructura del Repositorio
 
-* `index.html` - Panel principal y bienvenida.
-* `registro.html` - Formulario estándar de registro de voluntarios.
-* `registro2.html` - Panel de registro en dos columnas con tarjetas laterales.
-* `avistamiento.html` - Formulario de ingreso de avistamientos con validación multimedia.
-* `consultas.html` - Interfaz de tabla con filtros, ordenamiento y paginación.
-* `metricas.html` - Dashboard estadístico con gráficos de Chart.js.
-* `registro.js` - Lógica de eventos y validaciones para formularios de registro.
-* `avistamiento.js` - Lógica de validación de fechas, evidencias y comunas.
-* `consultas.js` - Lógica de filtrado, ordenamiento y paginación sobre arreglos en memoria.
-* `metricas.js` - Configuración e inicialización de gráficos en canvas.
-* `style.css` - Hoja de estilos global desarrollada en CSS3 (Flexbox, Grid, diseño adaptativo).
-* `README.md` - Documentación de entrega.
+* `app.py` - Servidor principal de Flask, rutas de navegación, endpoints API y lógica de base de datos.
+* `templates/` - Plantillas HTML con motor Jinja2 (`index.html`, `registro.html`, `avistamiento.html`, `consultas.html`, `metricas.html`).
+* `static/`
+* `css/style.css` - Hojas de estilo generales del sitio.
+* `js/` - Scripts para interacciones en cliente (`registro.js`, `avistamiento.js`, `consultas.js`, `metricas.js`).
+* `uploads/` - Directorio donde se almacenan las imágenes y videos subidos por los usuarios.
+* `README.md` - Documentación de entrega para la Tarea 2.
 
 ---
+
+
 <p align="center">
   <sub>README desarrollado con Gemini</sub>
 </p>
