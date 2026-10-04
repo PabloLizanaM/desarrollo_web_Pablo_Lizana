@@ -1,6 +1,6 @@
-from flask import Flask
-from flask import request, render_template, redirect, url_for, jsonify
-import pymysql
+from flask import Flask, request, render_template, redirect, url_for, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
@@ -14,24 +14,23 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 fecha_minima = "1980-01-01"
 
+USER = 'cc5002'
+PASSWORD = '' # Cambiar si utilizas contraseña local en tu entorno
+HOST = 'localhost'
+PORT = '3306'
+DB_NAME = 'tarea2'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}?charset=utf8"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def getConnection():
-    conn = pymysql.connect(
-        db= 'tarea2',
-        user= 'cc5002',
-        password= '', #cambiar por la contraseña de base de datos
-        host= 'localhost',
-        charset= 'utf8',
-    )
-    return conn
-
 @app.route('/', methods=['GET'])
 def index():
-    c =getConnection()
-    ultimos_avistamientos = get_ultimos_avistamientos(c)
-    c.close()
+    ultimos_avistamientos = get_ultimos_avistamientos()
     return render_template('index.html', ultimos_avistamientos=ultimos_avistamientos)
 
 @app.route('/registro', methods=['GET', 'POST'])
@@ -59,21 +58,15 @@ def registro():
             errors.append("La comuna es obligatoria.")
         
         if not errors:
-            c = getConnection()
-            
             fecha_registro = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            
-            voluntario_id = agregar_usuario_db(c, nombre, email, telefono, fecha_registro, comuna_id)
+            voluntario_id = agregar_usuario_db(nombre, email, telefono, fecha_registro, comuna_id)
             
             if voluntario_id:
                 message = "Usuario agregado exitosamente"
             else:
                 errors.append("Error al agregar el usuario. Verifica los datos ingresados.")
-            c.close()
         
-    c = getConnection()
-    regiones = get_regiones(c)
-    c.close()
+    regiones = get_regiones()
 
     return render_template(
         'registro.html', 
@@ -87,7 +80,6 @@ def registro():
 def avistamiento():
     errors = []
     message = None
-    c = getConnection()
     fecha_hoy = datetime.now().strftime('%Y-%m-%d')
     voluntario_seleccionado = request.args.get('voluntario_id') or request.form.get('voluntario_id', '').strip()
     
@@ -138,20 +130,18 @@ def avistamiento():
             if len(archivos_guardados) > 0:
                 dia_hora = f"{fecha} {hora}:00"
                 
-                if agregar_avistamiento_db(c, voluntario_id, ave_id, comuna_id, dia_hora, comentario, archivos_guardados):
+                if agregar_avistamiento_db(voluntario_id, ave_id, comuna_id, dia_hora, comentario, archivos_guardados):
                     message = "Avistamiento agregado exitosamente"
-                    c.close()
                     return redirect(url_for('index'))
                 else:
                     errors.append("Error al agregar el avistamiento. Verifica los datos ingresados.")
             else:
                 errors.append("Debe subir al menos un archivo válido (imagen o video).")
                     
-    aves = get_aves(c)
-    comunas = get_comunas(c)
-    voluntarios = get_voluntarios(c)
-    regiones = get_regiones(c)
-    c.close()
+    aves = get_aves()
+    comunas = get_comunas()
+    voluntarios = get_voluntarios()
+    regiones = get_regiones()
         
     return render_template(
         'avistamiento.html',
@@ -168,17 +158,12 @@ def avistamiento():
 
 @app.route('/consulta', methods=['GET'])
 def consulta():
-    c = getConnection()
-    avistamientos = get_avistamientos(c)
-    c.close()
+    avistamientos = get_avistamientos()
     return render_template('consultas.html', avistamientos=avistamientos)
 
 @app.route('/consulta/<int:avistamiento_id>', methods=['GET'])
-def detalle_avistamiento(avistamiento_id):
-    c = getConnection()
-    cursor = c.cursor(pymysql.cursors.DictCursor)
-    
-    sql = """
+def detalle_avistamiento(avistamiento_id):    
+    sql = text("""
         SELECT a.id, a.fecha_hora, a.descripcion,
             ave.nombre AS ave_nombre,
             com.nombre AS comuna_nombre,
@@ -189,41 +174,42 @@ def detalle_avistamiento(avistamiento_id):
         JOIN comuna com ON a.lugar = com.id
         JOIN region reg ON com.region_id = reg.id
         JOIN voluntario vol ON a.voluntario_id = vol.id
-        WHERE a.id = %s
-    """
-    cursor.execute(sql, (avistamiento_id,))
-    avistamiento = cursor.fetchone()
+        WHERE a.id = :id
+    """)
+    try:
+        result = db.session.execute(sql, {'id': avistamiento_id}).mappings().fetchone()
     
-    if avistamiento:
-        if isinstance(avistamiento['fecha_hora'], datetime):
-            avistamiento['fecha_hora'] = avistamiento['fecha_hora'].strftime('%Y-%m-%d %H:%M:%S')
+        if result:
+            avistamiento = dict(result)
+            if isinstance(avistamiento['fecha_hora'], datetime):
+                avistamiento['fecha_hora'] = avistamiento['fecha_hora'].strftime('%Y-%m-%d %H:%M:%S')
         
-        sql_archivos = "SELECT ruta_archivo, nombre_archivo FROM registro WHERE avistamiento_id = %s"
-        cursor.execute(sql_archivos, (avistamiento_id,))
-        avistamiento['archivos'] = cursor.fetchall()
+        sql_archivos = "SELECT ruta_archivo, nombre_archivo FROM registro WHERE avistamiento_id = :id"
+        archivos = db.session.execute(text(sql_archivos), {'id': avistamiento_id}).mappings().fetchall()
+        avistamiento['archivos'] = [dict(archivo) for archivo in archivos]
         
-    c.close()
-    return jsonify(avistamiento or {})
+        return jsonify(avistamiento)
+    
+    except Exception as e:
+        app.logger.error(f"Error al obtener detalle del avistamiento: {e}")
+        return jsonify({'error': str(e)}), 500
+    
+    return jsonify({}),404
 
 @app.route('/metricas', methods=['POST'])
 def metricas():
-    c = getConnection()
-    stats = get_metrics(c)
-    c.close()
+    stats = get_metrics()
     return render_template('metricas.html', stats=stats)
 
 @app.route('/get_comunas/<int:region_id>', methods=['GET'])
 def get_comunas_por_region(region_id):
-    c = getConnection()
-    cursor = c.cursor()
+    sql = text("SELECT id, nombre FROM comuna WHERE region_id = :region_id ORDER BY nombre ASC")
+    resultados = db.session.execute(sql, {'region_id': region_id}).mappings().fetchall()
+    comunas = [{'id': resultado['id'], 'nombre': resultado['nombre']} for resultado in resultados]
+    return jsonify({'comunas': comunas})
 
-    cursor.execute("SELECT id, nombre FROM comuna WHERE region_id = %s ORDER BY nombre ASC", (region_id,))
-    comunas = cursor.fetchall()
-    c.close()
-    return {"comunas": comunas}
-
-def get_ultimos_avistamientos(c):
-    sql = """
+def get_ultimos_avistamientos():
+    sql = text("""
         SELECT a.id, a.fecha_hora, ave.nombre AS ave_nombre, com.nombre AS comuna_nombre,
                 (SELECT CONCAT(r.ruta_archivo, r.nombre_archivo) 
                 FROM registro r 
@@ -235,76 +221,72 @@ def get_ultimos_avistamientos(c):
         JOIN comuna com ON a.lugar = com.id
         ORDER BY a.id DESC
         LIMIT 2
-    """
-    cursor = c.cursor()
-    cursor.execute(sql)
-    return cursor.fetchall()
+    """)
+    return db.session.execute(sql).fetchall()
 
-def agregar_usuario_db(c, nombre, email, telefono, fecha_registro, comuna_id):
+def agregar_usuario_db(nombre, email, telefono, fecha_registro, comuna_id):
     try:
-        sql = """INSERT INTO voluntario (nombre, email, telefono, fecha_registro, comuna_id) 
-        VALUES (%s, %s, %s, %s, %s)"""
-        cursor = c.cursor()
-        cursor.execute(sql, (nombre, email, telefono, fecha_registro, comuna_id))
-        c.commit()
-        return cursor.lastrowid
+        sql = text("INSERT INTO voluntario (nombre, email, telefono, fecha_registro, comuna_id) VALUES (:nombre, :email, :telefono, :fecha_registro, :comuna_id)")
+        result = db.session.execute(sql, {
+            'nombre': nombre,
+            'email': email,
+            'telefono': telefono,
+            'fecha_registro': fecha_registro,
+            'comuna_id': comuna_id
+        })
+        db.session.commit()
+        return result.lastrowid
     
-    except pymysql.Error as e:
-        c.rollback()
-        app.logger.error("Error con base de datos: {0} {1} ".format(e.args[0], e.args[1]))
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error("Error con base de datos: {e} ")
         return None
 
-def agregar_avistamiento_db(c, voluntario_id, ave_id, comuna_id, dia_hora, comentario, archivos):
+def agregar_avistamiento_db(voluntario_id, ave_id, comuna_id, dia_hora, comentario, archivos):
     try:
-        sql = """INSERT INTO avistamiento (voluntario_id, ave_id, fecha_hora, lugar, descripcion) 
-        VALUES (%s, %s, %s, %s, %s)"""
-        cursor = c.cursor()
-        cursor.execute(sql, (voluntario_id, ave_id, dia_hora, comuna_id, comentario))
-        avistamiento_id = cursor.lastrowid
+        sql = text("INSERT INTO avistamiento (voluntario_id, ave_id, fecha_hora, lugar, descripcion) VALUES (:voluntario_id, :ave_id, :fecha_hora, :lugar, :descripcion)")
+        result = db.session.execute(sql, {
+            'voluntario_id': voluntario_id,
+            'ave_id': ave_id,
+            'fecha_hora': dia_hora,
+            'lugar': comuna_id,
+            'descripcion': comentario
+        })
+        avistamiento_id = result.lastrowid
         
-        sql_archivo = "INSERT INTO registro (ruta_archivo, nombre_archivo, avistamiento_id) VALUES (%s, %s, %s)"
-        
+        sql_archivo = text("INSERT INTO registro (ruta_archivo, nombre_archivo, avistamiento_id) VALUES (:ruta_archivo, :nombre_archivo, :avistamiento_id)")
         for archivo in archivos:
-            cursor.execute(sql_archivo, (archivo['ruta'], archivo['nombre'], avistamiento_id))
-        
-        c.commit()
+            db.session.execute(sql_archivo, {
+                'ruta_archivo': archivo['ruta'],
+                'nombre_archivo': archivo['nombre'],
+                'avistamiento_id': avistamiento_id
+            })           
+        db.session.commit()
         return True
     
-    except pymysql.Error as e:
-        c.rollback()
-        app.logger.error("Error con base de datos: {0} {1} ".format(e.args[0], e.args[1]))
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error("Error con base de datos: {e}")
         return False
 
-def get_aves(c):
-    sql = "SELECT id, nombre FROM ave ORDER BY nombre ASC"
-    cursor = c.cursor()
-    cursor.execute(sql)
-    aves = cursor.fetchall()
-    return aves
+def get_aves():
+    sql = text("SELECT id, nombre FROM ave ORDER BY nombre ASC")
+    return db.session.execute(sql).fetchall()
 
-def get_comunas(c):
-    sql = "SELECT id, nombre FROM comuna ORDER BY nombre ASC"
-    cursor = c.cursor()
-    cursor.execute(sql)
-    comunas = cursor.fetchall()
-    return comunas
+def get_comunas():
+    sql = text("SELECT id, nombre FROM comuna ORDER BY nombre ASC")
+    return db.session.execute(sql).fetchall()
 
-def get_voluntarios(c):
-    sql = "SELECT id, nombre FROM voluntario ORDER BY nombre ASC"
-    cursor = c.cursor()
-    cursor.execute(sql)
-    voluntarios = cursor.fetchall()
-    return voluntarios
+def get_voluntarios():
+    sql = text("SELECT id, nombre FROM voluntario ORDER BY nombre ASC")
+    return db.session.execute(sql).fetchall()
 
-def get_regiones(c):
-    sql = "SELECT id, nombre FROM region ORDER BY nombre ASC"
-    cursor = c.cursor()
-    cursor.execute(sql)
-    regiones = cursor.fetchall()
-    return regiones
+def get_regiones():
+    sql = text("SELECT id, nombre FROM region ORDER BY nombre ASC")
+    return db.session.execute(sql).fetchall()
 
-def get_avistamientos(c):
-    sql = """
+def get_avistamientos():
+    sql = text("""
         SELECT a.id, a.fecha_hora,
                 ave.nombre AS ave_nombre, 
                 com.nombre AS comuna_nombre,
@@ -313,16 +295,16 @@ def get_avistamientos(c):
         JOIN ave ON a.ave_id = ave.id
         JOIN comuna com ON a.lugar = com.id
         ORDER BY a.id DESC
-    """
-    cursor = c.cursor(pymysql.cursors.DictCursor)
-    cursor.execute(sql)
-    
-    resultados = cursor.fetchall()
+    """)
+    resultados = db.session.execute(sql).mappings().fetchall()
+    lista_avistamientos = []
     for resultado in resultados:
-        if isinstance(resultado['fecha_hora'], datetime):
-            resultado['fecha_hora'] = resultado['fecha_hora'].strftime('%Y-%m-%d %H:%M:%S')
-            
-    return resultados
+        item = dict(resultado)
+        if isinstance(item['fecha_hora'], datetime):
+            item['fecha_hora'] = item['fecha_hora'].strftime('%Y-%m-%d %H:%M:%S')
+        lista_avistamientos.append(item)
+    return lista_avistamientos
+
 
 
 if __name__ == "__main__":
