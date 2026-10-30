@@ -449,6 +449,10 @@ textarea:focus {
     width: 100%;
 }
 
+.tarjeta-grafico:nth-child(3) {
+    grid-column: 1 / -1;
+}
+
 /* Opcional: Para pantallas móviles muy pequeñas pasa a 1 sola columna */
 @media (max-width: 500px) {
     .grid-resumen-metricas {

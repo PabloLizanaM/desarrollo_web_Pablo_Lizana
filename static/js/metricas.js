@@ -8,50 +8,79 @@ const datosMetricasRegion = [
     { region: "Coquimbo", reportes: 25 }
 ];
 
-document.addEventListener('DOMContentLoaded', () => {
-    const ctxAvistamientos = document.getElementById('chartAvistamientos').getContext('2d');
-    new Chart(ctxAvistamientos, {
-        type: 'bar',
-        data: {
-            labels: ['Metropolitana', 'Valparaíso', 'Biobío', 'La Araucanía', 'Los Ríos', 'Coquimbo'],
-            datasets: [{
-                label: 'Cantidad de Avistamientos',
-                data: [120, 85, 54, 41, 33, 25],
-                backgroundColor: '#27ae60',
-                borderColor: '#1e8449',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
+document.addEventListener('DOMContentLoaded', async() => {
+    try {
+        const ResDia = await fetch('/api/metricas/avistamientos-dia');
+        const DataDia = await ResDia.json();
+        const CtxDia = document.getElementById('chartAvistamientosDia').getContext('2d');
+        const ResAves = await fetch('/api/metricas/avistamientos-aves');
+        const DataAves = await ResAves.json();
+        const CtxAves = document.getElementById('chartAvistamientosAves').getContext('2d');
+        const ResComuna = await fetch('/api/metricas/voluntarios-comuna');
+        const DataComuna = await ResComuna.json();
+        const CtxComuna = document.getElementById('chartVoluntariosComuna').getContext('2d');
+
+        new Chart( CtxDia, {
+            type: 'line',
+            data: {
+                labels: DataDia.map(item => item.fecha),
+                datasets: [{
+                    label: 'Cantidad de Avistamientos',
+                    data: DataDia.map(item => item.total),
+                    borderColor: '#27ae60',
+                    backgroundColor: 'rgba(39, 174, 96, 0.2)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {beginAtZero:true, ticks: { stepSize:1 } }
                 }
             }
-        }
-    });
+        });
 
-    const ctxVoluntarios = document.getElementById('chartVoluntarios').getContext('2d');
-    new Chart(ctxVoluntarios, {
-        type: 'doughnut',
-        data: {
-            labels: ['Zona Norte', 'Zona Centro', 'Zona Sur', 'Zona Austral'],
-            datasets: [{
-                label: 'Voluntarios',
-                data: [18, 65, 31, 10],
-                backgroundColor: [
-                    '#f39c12',
-                    '#2980b9',
-                    '#27ae60',
-                    '#8e44ad'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
+        new Chart(CtxAves, {
+            type: 'pie',
+            data: {
+                labels: DataAves.map(item => item.ave),
+                datasets: [{
+                    data: DataAves.map(item => item.total),
+                    backgroundColor: [
+                        '#27ae60', '#2980b9', '#f39c12', '#e74c3c', '#8e44ad', '#1abc9c'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        new Chart(CtxComuna, {
+            type: 'bar',
+            data: {
+                labels: DataComuna.map(item => item.comuna),
+                datasets: [{
+                    label: 'Total de Voluntarios',
+                    data: DataComuna.map(item => item.total),
+                    backgroundColor: '#2980b9',
+                    borderColor: '#1f618d',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error al cargar y renderizar las metricas:', error);
+    }
 });

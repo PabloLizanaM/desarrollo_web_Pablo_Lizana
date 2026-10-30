@@ -196,10 +196,46 @@ def detalle_avistamiento(avistamiento_id):
     
     return jsonify({}),404
 
-@app.route('/metricas', methods=['POST'])
+@app.route('/metricas', methods=['GET'])
 def metricas():
-    stats = get_metrics()
-    return render_template('metricas.html', stats=stats)
+    return render_template('metricas.html')
+
+@app.route('/api/metricas/avistamientos-dia', methods = ['GET'])
+def api_avistamientos_dia():
+    sql = text("""
+            SELECT DATE(fecha_hora) AS fecha, COUNT(*) AS total
+            FROM avistamiento
+            GROUP BY DATE(fecha_hora)
+            ORDER BY fecha ASC
+    """)
+    resultados = db.session.execute(sql).mappings().fetchall()
+    datos = [{'fecha': str(r['fecha']), 'total': r['total']} for r in resultados]
+    return jsonify(datos)
+
+@app.route('/api/metricas/avistamientos-aves', methods = ['GET'])
+def api_avistamientos_aves():
+    sql = text("""
+            SELECT ave.nombre AS ave, COUNT(a.id) AS total
+            FROM avistamiento a
+            JOIN ave ON a.ave_id = ave.id
+            GROUP BY ave.nombre
+    """)
+    resultados = db.session.execute(sql).mappings().fetchall()
+    datos = [{'ave': r['ave'], 'total': r['total']} for r in resultados]
+    return jsonify(datos)
+
+@app.route('/api/metricas/voluntarios-comuna', methods = ['GET'])
+def api_voluntarios_comuna():
+    sql = text("""
+            SELECT comuna.nombre AS comuna, COUNT(v.id) AS total
+            FROM voluntario v
+            JOIN comuna ON v.comuna_id = comuna.id
+            GROUP BY comuna.nombre
+            ORDER BY total DESC    
+    """)
+    resultados = db.session.execute(sql).mappings().fetchall()
+    datos = [{'comuna': r['comuna'], 'total': r['total']} for r in resultados]
+    return jsonify(datos)
 
 @app.route('/get_comunas/<int:region_id>', methods=['GET'])
 def get_comunas_por_region(region_id):
