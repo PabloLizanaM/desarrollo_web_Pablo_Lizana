@@ -188,13 +188,55 @@ def detalle_avistamiento(avistamiento_id):
         archivos = db.session.execute(text(sql_archivos), {'id': avistamiento_id}).mappings().fetchall()
         avistamiento['archivos'] = [dict(archivo) for archivo in archivos]
         
+        sql_comentario = "SELECT id, nombre, texto, fecha FROM comentario WHERE avistamiento_id = :id ORDER BY fecha DESC"
+        comentarios = db.session.execute(text(sql_comentario), {'id': avistamiento_id}).mappings().fetchall()
+        lista_comentarios = []
+        
+        for comentario in comentarios:
+            com = dict(comentario)
+            if isinstance(com['fecha'], datetime):
+                com['fecha'] = com['fecha'].strftime('%Y-%m-%d %H:%M:%S')
+            lista_comentarios.append(com)
+        
+        avistamiento['comentarios'] = lista_comentarios
         return jsonify(avistamiento)
     
     except Exception as e:
         app.logger.error(f"Error al obtener detalle del avistamiento: {e}")
         return jsonify({'error': str(e)}), 500
-    
-    return jsonify({}),404
+
+@app.route('/consulta/<int:avistamiento_id>/comentario', methods=['POST'])
+def agregar_comentario(avistamiento_id):
+    try:
+        data = request.get_json()
+        nombre = data.get('nombre', '').strip()
+        texto = data.get('texto', '').strip()
+        
+        if not nombre or len(nombre) < 3 or len(nombre) > 50:
+            return jsonify({'success': False, 'error': 'El nombre debe tener al menos 3 y menos de 50 caracteres.'}), 400
+        
+        if not texto or len(texto) < 5:
+            return jsonify({'success': False, 'error': 'El comentario debe tener al menos 5 caracteres.'}), 400
+        
+        fecha_actual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        sql = text("""
+            INSERT INTO comentario (nombre, texto, fecha, avistamiento_id)
+            VALUES (:nombre, :texto, :fecha, :avistamiento_id)
+        """)
+        db.session.execute(sql, {
+            'nombre': nombre,
+            'texto': texto,
+            'fecha': fecha_actual,
+            'avistamiento_id': avistamiento_id
+        })
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Comentario agregado correctamente.'}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error al agregar comentario: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/metricas', methods=['GET'])
 def metricas():

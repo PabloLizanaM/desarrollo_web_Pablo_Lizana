@@ -61,6 +61,27 @@
             <p><strong>Descripción:</strong> <span id="modal-descripcion"></span></p>
             <h3>Archivos Adjuntos</h3>
             <div id="modal-galeria" class="galeria-archivos"></div>
+
+            <hr class="separador-modal">
+            <h3>Comentarios</h3>
+            <div id="modal-lista-comentarios" class="lista-comentarios">
+            </div>
+
+            <h3>Agregar Comentario</h3>
+            <form id="form-comentario">
+                <div class="campo">
+                    <label for="comentarista-nombre">Nombre del comentarista:</label>
+                    <input type="text" id="comentarista-nombre" placeholder="Ingrese su nombre (Entre 3 y 50 caracteres)" minlength="3" maxlength="50" required>
+                    <small id="nombre-error" class="mensaje-error">El nombre debe tener entre 3 y 50 caracteres.</small>
+                </div>
+                <div class="campo">
+                    <label for="comentario-texto">Comentario:</label>
+                    <textarea id="comentario-texto" rows="3" cols="40" placeholder="Ingrese su comentario (Mínimo 5 caracteres)" minlength="5" required></textarea>
+                    <small id="error-texto" class="mensaje-error">El comentario debe tener al menos 5 caracteres.</small>
+                </div>
+                <button type="submit">Enviar Comentario</button>
+                <p id ="mensaje-comentario-resultado" class="resultado-comentario"></p>
+            </form>
         </div>
     </div>
 

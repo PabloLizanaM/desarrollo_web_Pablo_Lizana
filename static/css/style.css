@@ -129,6 +129,17 @@ button[type="submit"]:hover {
     display: block;
 }
 
+.mensaje-exito {
+    display: none;
+    color: #27ae60;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+.mensaje-exito.visible {
+    display: block;
+}
+
 /* Sección Lista de Voluntarios */
 .contenedor-lista {
     margin-top: 2.5rem;
@@ -274,6 +285,12 @@ footer {
     font-size: 2.5rem;
     display: block;
     margin-bottom: 0.5rem;
+}
+
+.lista-comentarios {
+    margin-top: 1.5rem;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 /* Responsivo para móviles */
@@ -516,6 +533,38 @@ textarea:focus {
 
 .fila-avistamiento:hover {
     background-color: #f1f5f9;
+}
+
+/* Estilos para la sección de comentarios en el modal */
+.separador-modal {
+    margin: 20px 0;
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+}
+
+.resultado-comentario {
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.comentario-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.comentario-meta {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 0.2rem;
+}
+
+.comentario-texto {
+    font-size: 0.95rem;
+    color: #1e293b;
+    word-break: break-word;
 }
 
 /* Hecho con Gemini */

@@ -12,6 +12,7 @@ const datosAvistamientos = [
 
 const ITEMS_POR_PAGINA = 5;
 let paginaActual = 1;
+let avistamientoActual = null;
 
 const filtroAveInput = document.getElementById('filtro-ave');
 const ordenarPorSelect = document.getElementById('ordenar-por');
@@ -96,6 +97,7 @@ const renderizarTabla = () => {
 };
 
 const abrirDetalleAvistamiento = async (id) => {
+    avistamientoActual = id;
     try {
         const response = await fetch(`/consulta/${id}`);
         const data = await response.json();
@@ -133,12 +135,82 @@ const abrirDetalleAvistamiento = async (id) => {
             } else {
                 modalArchivos.textContent = 'No hay evidencia disponible para este avistamiento.';
             }
+
+            renderizarComentarios(data.comentarios);
+            document.getElementById('form-comentario').reset();
+            document.getElementById('mensaje-comentario-resultado').textContent = '';
+
             modal.style.display = 'flex';
         }
     } catch (error) {
         console.error('Error al abrir el detalle del avistamiento:', error);
     }
 };
+
+const renderizarComentarios = (comentarios) => {
+    const contenedorComentarios = document.getElementById('modal-lista-comentarios');
+    contenedorComentarios.innerHTML = '';
+
+    if (comentarios && comentarios.length > 0) {
+        comentarios.forEach(comentario => {
+            let divComentario = document.createElement('div');
+            divComentario.className = 'comentario-item';
+            
+            let pComentario = document.createElement('p');
+            pComentario.className = 'comentario-meta';
+            pComentario.innerHTML = `<strong>${comentario.nombre}</strong> - ${comentario.fecha}`;
+
+            let pTexto = document.createElement('p');
+            pTexto.className = 'comentario-texto';
+            pTexto.textContent = comentario.texto;
+
+            divComentario.appendChild(pComentario);
+            divComentario.appendChild(pTexto);
+            contenedorComentarios.appendChild(divComentario);
+        });
+    } else {
+        contenedorComentarios.innerHTML = '<p style="color: #64748b; font-style: italic;">No hay comentarios para este avistamiento.</p>';
+    }
+};
+
+document.getElementById('form-comentario').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('comentarista-nombre').value.trim();
+    const texto = document.getElementById('comentario-texto').value.trim();
+    const resultadoMensaje = document.getElementById('mensaje-comentario-resultado');
+
+    if (nombre.length < 3 || nombre.length > 50) {
+        resultadoMensaje.textContent = 'El nombre debe tener entre 3 y 50 caracteres.';
+        return;
+    }
+
+    if (texto.length < 5) {
+        resultadoMensaje.textContent = 'El comentario debe tener al menos 5 caracteres.';
+        return;
+    }
+
+    try {
+        const response = await fetch(`/consulta/${avistamientoActual}/comentario`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, texto })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            resultadoMensaje.textContent = data.message;
+            document.getElementById('form-comentario').reset();
+
+            abrirDetalleAvistamiento(avistamientoActual);
+        } else {
+            resultadoMensaje.textContent = `Error: ${data.message}`;
+        }
+    } catch (error) {
+        console.error('Error al enviar el comentario:', error);
+        resultadoMensaje.textContent = 'Ocurrió un error al enviar el comentario.';
+    }
+});
 
 btnCerrarModal.onclick = () => {
     modal.style.display = 'none';
