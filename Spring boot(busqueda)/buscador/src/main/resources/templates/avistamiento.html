@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportar Avistamiento - Avistamiento de Aves</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+    <main>
+        <h1>Reportar Avistamiento de Ave</h1>
+        <p>Los campos marcados con un asterisco (*) son obligatorios.</p>
+
+        <form id="form-avistamiento" th:action="@{/avistamiento}" method="post" enctype="multipart/form-data" novalidate>
+            <div class="campo">
+                <label for="voluntario-id">Voluntario(a) que reporta *</label>
+                <select id="voluntario-id" name="voluntario_id" required>
+                    <option value="">Seleccione un voluntario</option>
+                    <option th:each="vol : ${voluntarios}"
+                        th:value="${vol.id}"
+                        th:text="${vol.nombre}"
+                        th:selected="${voluntarioSeleccionado != null and voluntarioSeleccionado.toString() == vol.id.toString()}">
+                        Voluntario
+                    </option>
+                </select>
+                <span id="error-voluntario" class="mensaje-error">Debe seleccionar un voluntario.</span>
+            </div>
+
+            <div class="campo">
+                <label for="nombre-ave">Ave observada *</label>
+                <select id="nombre-ave" name="nombreAve" required>
+                    <option value="">Seleccione un ave</option>
+                    <option th:each="ave : ${aves}"
+                            th:value="${ave.id}"
+                            th:text="${ave.nombre}">Ave
+                    </option>
+                </select>
+                <span id="error-nombre-ave" class="mensaje-error">Por favor, seleccione un ave.</span>
+            </div>
+
+            <div class="campo">
+                <label for="fecha-avistamiento">Fecha del avistamiento *</label>
+                <input type="date" id="fecha-avistamiento" name="fechaAvistamiento" th:attr="min=${fechaMinima},max=${fechaHoy}" required>
+                <span id="error-fecha" class="mensaje-error">Ingrese una fecha válida (no puede ser futura).</span>
+            </div>
+
+            <div class="campo">
+                <label for="hora-avistamiento">Hora del avistamiento *</label>
+                <input type="time" id="hora-avistamiento" name="horaAvistamiento" required>
+                <span id="error-hora" class="mensaje-error">Ingrese una hora válida.</span>
+            </div>
+
+            <div class="campo">
+                <label for="region-avistamiento">Región *</label>
+                <select id="region-avistamiento" name="regionAvistamiento" required>
+                    <option value="">Seleccione una región</option>
+                    <option th:each="reg : ${regiones}"
+                            th:value="${reg.id}"
+                            th:text="${reg.nombre}">Región
+                    </option>
+                </select>
+                <span id="error-region-avistamiento" class="mensaje-error">Por favor, seleccione una región.</span>
+            </div>
+
+            <div class="campo">
+                <label for="comuna-avistamiento">Comuna *</label>
+                <select id="comuna-avistamiento" name="comunaAvistamiento" disabled required>
+                    <option value="">Seleccione una región primero</option>
+                </select>
+                <span id="error-comuna-avistamiento" class="mensaje-error">Por favor, seleccione una comuna.</span>
+            </div>
+
+            <div class="campo">
+                <label for="archivo-avistamiento">Evidencia fotográfica o video *</label>
+                <input type="file" id="archivo-avistamiento" name="archivoAvistamiento" accept="image/*,video/*">
+                <span id="error-archivo" class="mensaje-error">Debe adjuntar al menos un archivo de imagen o video.</span>
+            </div>
+
+            <div class="campo">
+            <label for="descripcion-avistamiento">Notas u observaciones del entorno</label>
+                <textarea id="descripcion-avistamiento" name="descripcionAvistamiento" rows="4" placeholder="Ej: Observado en copa de árbol cerca del río a primeras horas de la mañana."></textarea>
+            </div>
+
+            <div class="campo">
+                <button type="submit">Enviar Reporte de Avistamiento</button>
+            </div>
+        </form>
+    </main>
+
+    <footer>
+        <p>Unión de Ornitólogos de Chile - Prototipo Sistema Web</p>
+    </footer>
+
+    <script th:src="@{/avistamiento.js}"></script>
+</body>
+</html>

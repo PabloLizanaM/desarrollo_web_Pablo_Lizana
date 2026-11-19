@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta Avistamientos - Avistamiento de Aves</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+    <main class="main-consultas">
+        <h1>Historial de Avistamientos</h1>
+        <p>Consulta, filtra y ordena los avistamientos reportados por la comunidad.</p>
+
+        <div class="panel-controles">
+            <div class="control-grupo">
+                <label for="filtro-ave">Filtrar por tipo de ave:</label>
+                <input type="text" id="filtro-ave" placeholder="Ej: Chincol, Loica, Cóndor...">
+            </div>
+
+            <div class="control-grupo">
+                <label for="ordenar-por">Ordenar por:</label>
+                <select id="ordenar-por">
+                    <option value="fecha-desc">Fecha (más reciente primero)</option>
+                    <option value="fecha-asc">Fecha (más antigua primero)</option>
+                    <option value="lugar-asc">Lugar (A - Z)</option>
+                    <option value="lugar-desc">Lugar (Z - A)</option>
+                    <option value="ave-asc">Especie (A - Z)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="contenedor-tabla">
+            <table class="tabla-avistamientos">
+                <thead>
+                    <tr>
+                        <th>Especie</th>
+                        <th>Fecha y hora</th>
+                        <th>Ubicación</th>
+                        <th>Evidencia</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla-avistamientos">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="paginacion-contenedor">
+            <button id="btn-anterior" class="btn-paginacion">&laquo; Anterior</button>
+            <span id="info-pagina">Página 1 de 1</span>
+            <button id="btn-siguiente" class="btn-paginacion">Siguiente &raquo;</button>
+        </div>
+    </main>
+
+    <div id ="modal-detalle" class="modal">
+        <div class="modal-contenido">
+            <span class="cerrar-modal" id="cerrar-modal">&times;</span>
+            <h2 id="modal-ave-nombre">Detalle del Avistamiento</h2>
+            <p><strong>Voluntario:</strong> <span id="modal-voluntario"></span></p>
+            <p><strong>Fecha/Hora:</strong> <span id="modal-fecha"></span></p>
+            <p><strong>Ubicación:</strong> <span id="modal-ubicacion"></span></p>
+            <p><strong>Descripción:</strong> <span id="modal-descripcion"></span></p>
+            <h3>Archivos Adjuntos</h3>
+            <div id="modal-galeria" class="galeria-archivos"></div>
+
+            <hr class="separador-modal">
+            <h3>Comentarios</h3>
+            <div id="modal-lista-comentarios" class="lista-comentarios">
+            </div>
+
+            <h3>Agregar Comentario</h3>
+            <form id="form-comentario">
+                <div class="campo">
+                    <label for="comentarista-nombre">Nombre del comentarista:</label>
+                    <input type="text" id="comentarista-nombre" placeholder="Ingrese su nombre (Entre 3 y 50 caracteres)" minlength="3" maxlength="50" required>
+                    <small id="nombre-error" class="mensaje-error">El nombre debe tener entre 3 y 50 caracteres.</small>
+                </div>
+                <div class="campo">
+                    <label for="comentario-texto">Comentario:</label>
+                    <textarea id="comentario-texto" rows="3" cols="40" placeholder="Ingrese su comentario (Mínimo 5 caracteres)" minlength="5" required></textarea>
+                    <small id="error-texto" class="mensaje-error">El comentario debe tener al menos 5 caracteres.</small>
+                </div>
+                <button type="submit">Enviar Comentario</button>
+                <p id ="mensaje-comentario-resultado" class="resultado-comentario"></p>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>Unión de Ornitólogos de Chile - Prototipo Sistema Web</p>
+    </footer>
+
+    <script th:inline="javascript">
+        const datosAvistamientos = /*[[${avistamientos}]]*/ [];
+    </script>
+
+    <script th:src="@{/consultas.js}"></script>
+</body>
+</html>

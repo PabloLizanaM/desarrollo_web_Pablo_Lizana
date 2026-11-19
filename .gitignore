@@ -1,2 +1,4 @@
 .venv/
-static/uploads/*
+.metals/
+.vscode/
+Flask(app web)/static/uploads/*

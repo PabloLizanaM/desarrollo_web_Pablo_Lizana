@@ -1,0 +1,570 @@
+/* Reset básico y caja */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    color: #333333;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Encabezado y Navegación */
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover,
+nav a:focus {
+    background-color: #34495e;
+}
+
+/* Estructura Principal */
+main {
+    flex: 1;
+    max-width: 650px;
+    width: 90%;
+    margin: 2rem auto;
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+}
+
+main > p {
+    color: #666666;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+/* Campos de Formulario */
+.campo {
+    margin-bottom: 1.25rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #444444;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #ffffff;
+    transition: border-color 0.2s ease;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+select:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+/* Botón de Enviar */
+button[type="submit"] {
+    width: 100%;
+    padding: 0.85rem;
+    background-color: #27ae60;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #219150;
+}
+
+/* Manejo de Validaciones JS */
+.mensaje-error {
+    display: none;
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 0.35rem;
+    font-weight: 500;
+}
+
+.mensaje-error.visible {
+    display: block;
+}
+
+.mensaje-exito {
+    display: none;
+    color: #27ae60;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+.mensaje-exito.visible {
+    display: block;
+}
+
+/* Sección Lista de Voluntarios */
+.contenedor-lista {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.contenedor-lista h2 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.voluntario-item {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.voluntario-item .nombre {
+    font-weight: bold;
+    color: #1a202c;
+}
+
+.voluntario-item .contacto,
+.voluntario-item .ubicacion {
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+
+/* Pie de Página */
+footer {
+    background-color: #ecf0f1;
+    text-align: center;
+    padding: 1rem;
+    margin-top: auto;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+/* Panel de bienvenida e index */
+.bienvenida {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.panel-acciones h2 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 1.25rem;
+    text-align: center;
+}
+
+.grid-botones-index {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+}
+
+.tarjeta-boton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: #ffffff;
+    border: 2px solid #e2e8f0;
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-boton:hover,
+.tarjeta-boton:focus {
+    transform: translateY(-3px);
+    border-color: #27ae60;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.icono-boton {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.tarjeta-boton h3 {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+}
+
+.tarjeta-boton p {
+    font-size: 0.85rem;
+    color: #666666;
+    line-height: 1.4;
+}
+
+/* Estilos para el diseño de Registro 2 Columnas */
+.main-registro2 {
+    max-width: 950px; /* Ampliado para espacio de 2 columnas */
+}
+
+.contenedor-dos-columnas {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    align-items: flex-start;
+}
+
+.columna-formulario {
+    flex: 1.2;
+}
+
+.columna-metricas {
+    flex: 0.8;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.columna-metricas h2 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.tarjeta-acceso-metricas {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #ffffff;
+    border: 1px dashed #3498db;
+    border-radius: 6px;
+}
+
+.icono-metricas {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.lista-comentarios {
+    margin-top: 1.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Responsivo para móviles */
+@media (max-width: 768px) {
+    .contenedor-dos-columnas {
+        flex-direction: column;
+    }
+    .columna-metricas {
+        width: 100%;
+    }
+}
+
+/* Estilos para el formulario de avistamientos */
+input[type="file"] {
+    padding: 0.5rem;
+    background-color: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+}
+
+textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* Controles de Filtro, Ordenamiento y Paginación */
+.panel-controles {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    background-color: #f8fafc;
+    padding: 1rem 1.25rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.control-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.control-grupo label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #2c3e50;
+}
+
+.control-grupo input,
+.control-grupo select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.paginacion-contenedor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-paginacion {
+    background-color: #2c3e50;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-paginacion:hover:not(:disabled) {
+    background-color: #34495e;
+}
+
+.btn-paginacion:disabled {
+    background-color: #cbd5e1;
+    cursor: not-allowed;
+}
+
+#info-pagina {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Estilos para el panel de Métricas */
+.main-metricas {
+    max-width: 900px;
+}
+
+.grid-resumen-metricas {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Organiza las 4 tarjetas en 2 columnas fijas (2x2) */
+    gap: 1.25rem;
+    margin: 1.5rem 0 2.5rem 0;
+}
+
+.tarjeta-metrica {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-top: 4px solid #27ae60;
+    padding: 1.25rem 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.numero-metrica {
+    display: block;
+    font-size: 1.4rem; /* Se reduce de 1.8rem a 1.4rem para que textos largos quepan */
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+    overflow-wrap: break-word; /* Evita desbordamiento en pantallas pequeñas */
+}
+
+.label-metrica {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.seccion-desglose h2 {
+    font-size: 1.25rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+/* Contenedores de Gráficos */
+.contenedor-graficos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.tarjeta-grafico {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.tarjeta-grafico h2 {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.canvas-contenedor {
+    position: relative;
+    height: 280px;
+    width: 100%;
+}
+
+.tarjeta-grafico:nth-child(3) {
+    grid-column: 1 / -1;
+}
+
+/* Opcional: Para pantallas móviles muy pequeñas pasa a 1 sola columna */
+@media (max-width: 500px) {
+    .grid-resumen-metricas {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Estilos para Modal de Detalle de Avistamientos */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-contenido {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.cerrar-modal {
+    position: absolute;
+    right: 1.25rem;
+    top: 0.75rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #666666;
+    cursor: pointer;
+}
+
+.cerrar-modal:hover {
+    color: #000000;
+}
+
+.galeria-archivos img,
+.galeria-archivos video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin-top: 0.75rem;
+    border: 1px solid #e2e8f0;
+}
+
+.fila-avistamiento {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.fila-avistamiento:hover {
+    background-color: #f1f5f9;
+}
+
+/* Estilos para la sección de comentarios en el modal */
+.separador-modal {
+    margin: 20px 0;
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+}
+
+.resultado-comentario {
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.comentario-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.comentario-meta {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 0.2rem;
+}
+
+.comentario-texto {
+    font-size: 0.95rem;
+    color: #1e293b;
+    word-break: break-word;
+}
+
+/* Hecho con Gemini */

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenida - Avistamiento de Aves</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+    <main>
+        <section class="bienvenida">
+            <h1>¡Te damos la bienvenida, Voluntario(a)!</h1>
+            <p>Gracias por participar en la Red de Avistamiento de Aves. Desde este panel principal puedes acceder a la gestión de avistamientos, consultar el historial registrado o analizar las estadísticas globales de la plataforma.</p>
+        </section>
+
+        <nav class="panel-acciones">
+            <h2>¿Qué deseas hacer hoy?</h2>
+
+            <div class="grid-botones-index">
+                <a th:href="@{/avistamiento}" class="tarjeta-boton">
+                <span class="icono-boton">🦜</span>
+                <h3>Registrar Avistamiento</h3>
+                <p>Ingresa un nuevo reporte de ave con su ubicación y fotos o videos.</p>
+                </a>
+
+                <a th:href="@{/consultas}" class="tarjeta-boton">
+                <span class="icono-boton">🔍</span>
+                <h3>Consultar Lista de Avistamientos</h3>
+                <p>Busca y visualiza avistamientos registrados.</p>
+                </a>
+
+                <a th:href="@{/metricas}" class="tarjeta-boton">
+                <span class="icono-boton">📊</span>
+                <h3>Métricas y Voluntarios</h3>
+                <p>Monitoreo de avistamientos y voluntarios</p>
+                </a>
+
+                <a th:href="@{/registro}" class="tarjeta-boton">
+                <span class="icono-boton">✍️</span>
+                <h3>Registrar Voluntario</h3>
+                <p>Accede al panel interactivo con registro dinámico y consulta directa de métricas.</p>
+                </a>
+            </div>
+        </nav>
+
+        <section class="ultimos-avistamientos">
+            <h2>Últimos 2 Avistamientos Registrados</h2>
+            <div class="grid-ultimos" th:if="${not #lists.isEmpty(ultimosAvistamientos)}">
+                <div class="tarjeta-avistamiento" th:each="ave : ${ultimosAvistamientos}">
+                    <img th:if="${ave[4] != null}" th:src="@{'/' + ${ave[4]}}" th:alt="${ave[2]}" width="150">
+                    <div>
+                        <h3 th:text="${ave[2]}">Especie</h3>
+                        <p><strong>Fecha/Hora:</strong> <span th:text="${ave[1]}"></span></p>
+                        <p><strong>Comuna:</strong> <span th:text="${ave[3]}"></span></p>
+                    </div>
+                </div>
+            </div>
+            <p th:if="${#lists.isEmpty(ultimosAvistamientos)}">No hay avistamientos registrados aún.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>Unión de Ornitólogos de Chile - Prototipo Sistema Web</p>
+    </footer>
+
+    <script th:src="@{/index.js}"></script>
+</body>
+</html>
