@@ -567,4 +567,39 @@ textarea:focus {
     word-break: break-word;
 }
 
+/* Resaltado de coincidencias en el buscador */
+mark {
+    background-color: #fef08a;
+    color: #1e293b;
+    padding: 0.05rem 0.2rem;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+/* Tabla de avistamientos en consultas */
+.contenedor-tabla {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 1.25rem;
+}
+
+.tabla-avistamientos {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.tabla-avistamientos th,
+.tabla-avistamientos td {
+    padding: 0.75rem 0.85rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.tabla-avistamientos thead th {
+    background-color: #f8fafc;
+    color: #2c3e50;
+    font-weight: 700;
+}
+
 /* Hecho con Gemini */

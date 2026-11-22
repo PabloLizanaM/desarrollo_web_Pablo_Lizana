@@ -43,7 +43,7 @@ const validarRegion = (region) => region !== "";
 const validarComuna = (comuna) => comuna !== "";
 
 const validarArchivo = (archivoInput) => {
-    if (!archivoInput.files || archivoInput.files.length === 0) return false;
+    if (!archivoInput || !archivoInput.files || archivoInput.files.length === 0) return false;
 
     const archivo = archivoInput.files[0];
     const esImagenOVideo = archivo.type.startsWith('image/') || archivo.type.startsWith('video/');
@@ -73,157 +73,88 @@ let errorRegion = document.getElementById('error-region-avistamiento');
 let errorComuna = document.getElementById('error-comuna-avistamiento');
 let errorArchivo = document.getElementById('error-archivo');
 
-let listaAvistamientos = document.getElementById('lista-avistamientos');
-let totalAvistamientos = document.getElementById('total-avistamientos');
+const toggleError = (input, errorEl, esValido) => {
+    if (input) input.style.borderColor = esValido ? '' : 'red';
+    if (errorEl) errorEl.classList.toggle('visible', !esValido);
+};
 
-regionSelect.addEventListener('change', async() => {
-    let regionId = regionSelect.value;
+if (regionSelect && comunaSelect) {
+    regionSelect.addEventListener('change', async () => {
+        const regionValor = regionSelect.value;
+        comunaSelect.innerHTML = '<option value="">Seleccione una comuna</option>';
 
-    comunaSelect.innerHTML = '<option value="">Seleccione una comuna</option>';
+        if (!regionValor) {
+            comunaSelect.disabled = true;
+            return;
+        }
 
-    if (!regionId) {
-        comunaSelect.disabled = true;
-        return;
-    }
-
-    try {
-        const response = await fetch(`/get_comunas/${regionId}`);
-        const data = await response.json();
-
-        if (data.comunas && data.comunas.length > 0) {
-            data.comunas.forEach(comuna => {
-                let option = document.createElement('option');
-                
-                // Si usas DictCursor en app.py:
-                option.value = comuna.id || comuna[0];
-                option.textContent = comuna.nombre || comuna[1];
-                
+        if (!/^\d+$/.test(regionValor) && comunasPorRegion[regionValor]) {
+            comunasPorRegion[regionValor].forEach(nombreComuna => {
+                const option = document.createElement('option');
+                option.value = nombreComuna;
+                option.textContent = nombreComuna;
                 comunaSelect.appendChild(option);
             });
             comunaSelect.disabled = false;
-        } else {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/get_comunas/${encodeURIComponent(regionValor)}`);
+            const data = await response.json();
+
+            if (data.comunas && data.comunas.length > 0) {
+                data.comunas.forEach(comuna => {
+                    const option = document.createElement('option');
+                    option.value = comuna.id ?? comuna[0];
+                    option.textContent = comuna.nombre ?? comuna[1];
+                    comunaSelect.appendChild(option);
+                });
+                comunaSelect.disabled = false;
+            } else {
+                comunaSelect.disabled = true;
+            }
+        } catch (error) {
+            console.error('Error al obtener comunas:', error);
             comunaSelect.disabled = true;
         }
-    } catch (error) {
-        console.error('Error al obtener comunas:', error);
-        comunaSelect.disabled = true;
-    }
-});
+    });
+}
 
-form.addEventListener('submit', (event) => {
-    let esValido = true;
+if (form) {
+    form.addEventListener('submit', (event) => {
+        let esValido = true;
 
-    if (!validarVoluntario(voluntarioSelect.value)) {
-        esValido = false;
-        voluntarioSelect.style.borderColor = 'red';
-        if (errorVoluntario) errorVoluntario.classList.add('visible');
-    } else {
-        voluntarioSelect.style.borderColor = '';
-        if (errorVoluntario) errorVoluntario.classList.remove('visible');
-    }
+        const volOk = validarVoluntario(voluntarioSelect?.value ?? '');
+        toggleError(voluntarioSelect, errorVoluntario, volOk);
+        if (!volOk) esValido = false;
 
-    if (!validarNombreAve(nombreAveInput.value)) {
-        esValido = false;
-        nombreAveInput.style.borderColor = 'red';
-        errorNombreAve.classList.add('visible');
-    } else {
-        nombreAveInput.style.borderColor = '';
-        errorNombreAve.classList.remove('visible');
-    }
+        const aveOk = validarNombreAve(nombreAveInput?.value ?? '');
+        toggleError(nombreAveInput, errorNombreAve, aveOk);
+        if (!aveOk) esValido = false;
 
-/*
-    if (!validarCantidad(cantidadInput.value)) {
-        esValido = false;
-        cantidadInput.style.borderColor = 'red';
-        errorCantidad.classList.add('visible');
-    } else {
-        cantidadInput.style.borderColor = '';
-        errorCantidad.classList.remove('visible');
-    }
-*/
+        const fechaOk = validarFecha(fechaInput?.value ?? '');
+        toggleError(fechaInput, errorFecha, fechaOk);
+        if (!fechaOk) esValido = false;
 
-    if (!validarFecha(fechaInput.value)) {
-        esValido = false;
-        fechaInput.style.borderColor = 'red';
-        errorFecha.classList.add('visible');
-    } else {
-        fechaInput.style.borderColor = '';
-        errorFecha.classList.remove('visible');
-    }
+        const horaOk = validarHora(horaInput?.value ?? '');
+        toggleError(horaInput, errorHora, horaOk);
+        if (!horaOk) esValido = false;
 
-    if (!validarHora(horaInput.value)) {
-        esValido = false;
-        horaInput.style.borderColor = 'red';
-        errorHora.classList.add('visible');
-    } else {
-        horaInput.style.borderColor = '';
-        errorHora.classList.remove('visible');
-    }
+        const regionOk = validarRegion(regionSelect?.value ?? '');
+        toggleError(regionSelect, errorRegion, regionOk);
+        if (!regionOk) esValido = false;
 
-    if (!validarRegion(regionSelect.value)) {
-        esValido = false;
-        regionSelect.style.borderColor = 'red';
-        errorRegion.classList.add('visible');
-    } else {
-        regionSelect.style.borderColor = '';
-        errorRegion.classList.remove('visible');
-    }
+        const comunaOk = validarComuna(comunaSelect?.value ?? '');
+        toggleError(comunaSelect, errorComuna, comunaOk);
+        if (!comunaOk) esValido = false;
 
-    if (!validarComuna(comunaSelect.value)) {
-        esValido = false;
-        comunaSelect.style.borderColor = 'red';
-        errorComuna.classList.add('visible');
-    } else {
-        comunaSelect.style.borderColor = '';
-        errorComuna.classList.remove('visible');
-    }
+        const archivoOk = validarArchivo(archivoInput);
+        toggleError(archivoInput, errorArchivo, archivoOk);
+        if (!archivoOk) esValido = false;
 
-    if (!validarArchivo(archivoInput)) {
-        esValido = false;
-        archivoInput.style.borderColor = 'red';
-        errorArchivo.classList.add('visible');
-    } else {
-        archivoInput.style.borderColor = '';
-        errorArchivo.classList.remove('visible');
-    }
-
-    if (!esValido) {
-        event.preventDefault();
-    }
-
-    /*
-    if (esValido) {
-        if (listaAvistamientos) {
-            let item = document.createElement('div');
-            item.className = 'avistamiento-item';
-
-            let spanAve = document.createElement('span');
-            spanAve.className = 'nombre-ave';
-            spanAve.textContent = `${nombreAveInput.value.trim()} (${cantidadInput.value} ej.)`;
-
-            let spanDetalles = document.createElement('span');
-            spanDetalles.className = 'detalles';
-            spanDetalles.textContent = `${fechaInput.value} — ${comunaSelect.value}, ${regionSelect.value}`;
-
-            let spanArchivo = document.createElement('span');
-            spanArchivo.className = 'archivo';
-            spanArchivo.textContent = `Archivo: ${archivoInput.files[0].name}`;
-
-            item.appendChild(spanAve);
-            item.appendChild(spanDetalles);
-            item.appendChild(spanArchivo);
-
-            listaAvistamientos.appendChild(item);
-
-            if (totalAvistamientos) {
-                totalAvistamientos.textContent = listaAvistamientos.children.length;
-            }
+        if (!esValido) {
+            event.preventDefault();
         }
-
-        form.reset();
-        comunaSelect.disabled = true;
-
-        alert('Reporte de avistamiento ingresado correctamente.');
-        window.location.href = 'index.html';
-    }*/
-});
+    });
+}

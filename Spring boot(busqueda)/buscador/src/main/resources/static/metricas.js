@@ -8,25 +8,22 @@ const datosMetricasRegion = [
     { region: "Coquimbo", reportes: 25 }
 ];
 
-document.addEventListener('DOMContentLoaded', async() => {
-    try {
-        const ResDia = await fetch('/api/metricas/avistamientos-dia');
-        const DataDia = await ResDia.json();
-        const CtxDia = document.getElementById('chartAvistamientosDia').getContext('2d');
-        const ResAves = await fetch('/api/metricas/avistamientos-aves');
-        const DataAves = await ResAves.json();
-        const CtxAves = document.getElementById('chartAvistamientosAves').getContext('2d');
-        const ResComuna = await fetch('/api/metricas/voluntarios-comuna');
-        const DataComuna = await ResComuna.json();
-        const CtxComuna = document.getElementById('chartVoluntariosComuna').getContext('2d');
+const cargarGraficoDia = async () => {
+    const canvas = document.getElementById('chartAvistamientosDia');
+    if (!canvas) return;
 
-        new Chart( CtxDia, {
+    try {
+        const res = await fetch('/api/metricas/avistamientos-dia');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        new Chart(canvas.getContext('2d'), {
             type: 'line',
             data: {
-                labels: DataDia.map(item => item.fecha),
+                labels: data.map(item => item.fecha),
                 datasets: [{
                     label: 'Cantidad de Avistamientos',
-                    data: DataDia.map(item => item.total),
+                    data: data.map(item => item.total),
                     borderColor: '#27ae60',
                     backgroundColor: 'rgba(39, 174, 96, 0.2)',
                     borderWidth: 2,
@@ -38,17 +35,30 @@ document.addEventListener('DOMContentLoaded', async() => {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: {beginAtZero:true, ticks: { stepSize:1 } }
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
                 }
             }
         });
+    } catch (error) {
+        console.error('Error al cargar avistamientos por día:', error);
+    }
+};
 
-        new Chart(CtxAves, {
+const cargarGraficoAves = async () => {
+    const canvas = document.getElementById('chartAvistamientosAves');
+    if (!canvas) return;
+
+    try {
+        const res = await fetch('/api/metricas/avistamientos-aves');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        new Chart(canvas.getContext('2d'), {
             type: 'pie',
             data: {
-                labels: DataAves.map(item => item.ave),
+                labels: data.map(item => item.ave),
                 datasets: [{
-                    data: DataAves.map(item => item.total),
+                    data: data.map(item => item.total),
                     backgroundColor: [
                         '#27ae60', '#2980b9', '#f39c12', '#e74c3c', '#8e44ad', '#1abc9c'
                     ]
@@ -59,14 +69,27 @@ document.addEventListener('DOMContentLoaded', async() => {
                 maintainAspectRatio: false
             }
         });
+    } catch (error) {
+        console.error('Error al cargar avistamientos por ave:', error);
+    }
+};
 
-        new Chart(CtxComuna, {
+const cargarGraficoComuna = async () => {
+    const canvas = document.getElementById('chartVoluntariosComuna');
+    if (!canvas) return;
+
+    try {
+        const res = await fetch('/api/metricas/voluntarios-comuna');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        new Chart(canvas.getContext('2d'), {
             type: 'bar',
             data: {
-                labels: DataComuna.map(item => item.comuna),
+                labels: data.map(item => item.comuna),
                 datasets: [{
                     label: 'Total de Voluntarios',
-                    data: DataComuna.map(item => item.total),
+                    data: data.map(item => item.total),
                     backgroundColor: '#2980b9',
                     borderColor: '#1f618d',
                     borderWidth: 1
@@ -81,6 +104,12 @@ document.addEventListener('DOMContentLoaded', async() => {
             }
         });
     } catch (error) {
-        console.error('Error al cargar y renderizar las metricas:', error);
+        console.error('Error al cargar voluntarios por comuna:', error);
     }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    cargarGraficoDia();
+    cargarGraficoAves();
+    cargarGraficoComuna();
 });

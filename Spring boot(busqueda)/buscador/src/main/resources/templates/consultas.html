@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,10 +12,10 @@
         <p>Consulta, filtra y ordena los avistamientos reportados por la comunidad.</p>
 
         <div class="panel-controles">
-            <div class="control-grupo">
-                <label for="filtro-ave">Filtrar por tipo de ave:</label>
-                <input type="text" id="filtro-ave" placeholder="Ej: Chincol, Loica, Cóndor...">
-            </div>
+            <form id="form-buscador" class="control-grupo" onsubmit="return false;">
+                <label for="busqueda-avistamiento">Buscar avistamiento:</label>
+                <input type="text" id="busqueda-avistamiento" placeholder="Ej: Chincol, Juan Pérez, San Bernardo..." autocomplete="off">
+            </form>
 
             <div class="control-grupo">
                 <label for="ordenar-por">Ordenar por:</label>
@@ -34,8 +34,9 @@
                 <thead>
                     <tr>
                         <th>Especie</th>
+                        <th>Voluntario</th>
                         <th>Fecha y hora</th>
-                        <th>Ubicación</th>
+                        <th>Comuna</th>
                         <th>Evidencia</th>
                     </tr>
                 </thead>

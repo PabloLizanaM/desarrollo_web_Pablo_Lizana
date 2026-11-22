@@ -11,10 +11,10 @@ public class VistaController {
         return "index";
     }
 
-    @GetMapping("/consultas")
-    public String consultas() {
-        return "consultas";
-    }
+    //@GetMapping("/consultas")
+    //public String consultas() {
+    //    return "consultas";
+    //}
 
     @GetMapping("/metricas")
     public String metricas() {

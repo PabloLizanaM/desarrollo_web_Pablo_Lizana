@@ -14,7 +14,9 @@ const ITEMS_POR_PAGINA = 5;
 let paginaActual = 1;
 let avistamientoActual = null;
 
-const filtroAveInput = document.getElementById('filtro-ave');
+const listaAvistamientos = typeof datosAvistamientos !== 'undefined' && Array.isArray(datosAvistamientos) ? datosAvistamientos: [];
+
+const busquedaInput = document.getElementById('busqueda-avistamiento');
 const ordenarPorSelect = document.getElementById('ordenar-por');
 const cuerpoTabla = document.getElementById('cuerpo-tabla-avistamientos');
 const btnAnterior = document.getElementById('btn-anterior');
@@ -23,14 +25,55 @@ const infoPagina = document.getElementById('info-pagina');
 
 const modal = document.getElementById('modal-detalle');
 const btnCerrarModal = document.getElementById('cerrar-modal');
+const formComentario = document.getElementById('form-comentario');
+
+const escaparRegex = (texto) => texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const crearCeldaConResaltado = (textoOriginal, patron) => {
+    const td = document.createElement('td');
+    const texto = textoOriginal ? String(textoOriginal) : '';
+
+    if (!patron) {
+        td.textContent = texto;
+        return td;
+    }
+
+    const regex = new RegExp(`(${escaparRegex(patron)})`, 'gi');
+    const partes = texto.split(regex);
+
+    partes.forEach(parte => {
+        if (!parte) return;
+        if (parte.toLowerCase() === patron.toLowerCase()) {
+            const mark = document.createElement('mark');
+            mark.textContent = parte;
+            td.appendChild(mark);
+        } else {
+            td.appendChild(document.createTextNode(parte));
+        }
+    });
+
+    return td;
+};
+
+const obtenerDia = (fechaHora) => {
+    if (!fechaHora) return '';
+    return String(fechaHora).split('T')[0].split(' ')[0];
+};
 
 const renderizarTabla = () => {
-    const textoFiltro = filtroAveInput.value.trim().toLowerCase();
-    const criterioOrden = ordenarPorSelect.value;
+    if (!cuerpoTabla) return;
 
-    let resultado = datosAvistamientos.filter(item => 
-        item.ave_nombre.toLowerCase().includes(textoFiltro)
-    );
+    const patronOriginal = busquedaInput ? busquedaInput.value.trim() : '';
+    const textoFiltro = patronOriginal.toLowerCase();
+    const criterioOrden = ordenarPorSelect ? ordenarPorSelect.value : 'fecha-desc';
+
+    let resultado = listaAvistamientos.filter(item =>{ 
+        if (!textoFiltro) return true;
+        const ave = (item.ave_nombre || '').toLowerCase();
+        const voluntario = (item.voluntario_nombre || '').toLowerCase();
+        const comuna = (item.comuna_nombre || '').toLowerCase();
+        return ave.includes(textoFiltro) || voluntario.includes(textoFiltro) || comuna.includes(textoFiltro);
+    });
 
     resultado.sort((a, b) => {
         if (criterioOrden === 'fecha-desc') {
@@ -38,11 +81,11 @@ const renderizarTabla = () => {
         } else if (criterioOrden === 'fecha-asc') {
             return new Date(a.fecha_hora) - new Date(b.fecha_hora);
         } else if (criterioOrden === 'lugar-asc') {
-            return a.comuna_nombre.localeCompare(b.comuna_nombre);
+            return (a.comuna_nombre || '').localeCompare(b.comuna_nombre || '');
         } else if (criterioOrden === 'lugar-desc') {
-            return b.comuna_nombre.localeCompare(a.comuna_nombre);
+            return (b.comuna_nombre || '').localeCompare(a.comuna_nombre || '');
         } else if (criterioOrden === 'ave-asc') {
-            return a.ave_nombre.localeCompare(b.ave_nombre);
+            return (a.ave_nombre || '').localeCompare(b.ave_nombre || '');
         }
         return 0;
     });
@@ -59,41 +102,41 @@ const renderizarTabla = () => {
     if (datosPaginados.length === 0) {
         let filaVacia = document.createElement('tr');
         let celdaVacia = document.createElement('td');
-        celdaVacia.colSpan = 4;
+        celdaVacia.colSpan = 5;
         celdaVacia.style.textAlign = 'center';
-        celdaVacia.textContent = 'No se encontraron avistamientos que coincidan con la búsqueda.';
+        celdaVacia.textContent = patronOriginal ? `No se encontraron avistamientos que coincidan con "${patronOriginal}".` : 'No hay avistamientos registrados.';
         filaVacia.appendChild(celdaVacia);
         cuerpoTabla.appendChild(filaVacia);
     } else {
         datosPaginados.forEach(item => {
             let tr = document.createElement('tr');
             tr.className = 'fila-avistamiento';
-            tr.onclick = () => {abrirDetalleAvistamiento(item.id)};
+            tr.onclick = () => abrirDetalleAvistamiento(item.id);
 
-            let tdAve = document.createElement('td');
-            tdAve.textContent = item.ave_nombre;
+            const tdAve = crearCeldaConResaltado(item.ave_nombre, patronOriginal);
+            const tdVoluntario = crearCeldaConResaltado(item.voluntario_nombre, patronOriginal);
 
             let tdFecha = document.createElement('td');
-            tdFecha.textContent = item.fecha_hora;
+            tdFecha.textContent = item.fecha_hora || obtenerDia(item.fecha_hora);
 
-            let tdLugar = document.createElement('td');
-            tdLugar.textContent = item.comuna_nombre;
+            const tdComuna = crearCeldaConResaltado(item.comuna_nombre, patronOriginal);
 
             let tdArchivo = document.createElement('td');
-            tdArchivo.textContent = `${item.cantidad_archivos} archivo(s)`;
+            tdArchivo.textContent = `${item.cantidad_archivos ?? 0} archivo(s)`;
 
             tr.appendChild(tdAve);
+            tr.appendChild(tdVoluntario);
             tr.appendChild(tdFecha);
-            tr.appendChild(tdLugar);
+            tr.appendChild(tdComuna);
             tr.appendChild(tdArchivo);
 
             cuerpoTabla.appendChild(tr);
         });
     }
 
-    infoPagina.textContent = `Página ${paginaActual} de ${totalPaginas}`;
-    btnAnterior.disabled = paginaActual === 1;
-    btnSiguiente.disabled = paginaActual === totalPaginas || totalPaginas === 0;
+    if (infoPagina) infoPagina.textContent = `Página ${paginaActual} de ${totalPaginas}`;
+    if (btnAnterior) btnAnterior.disabled = paginaActual === 1;
+    if (btnSiguiente) btnSiguiente.disabled = paginaActual === totalPaginas || totalPaginas === 0;
 };
 
 const abrirDetalleAvistamiento = async (id) => {
@@ -102,21 +145,22 @@ const abrirDetalleAvistamiento = async (id) => {
         const response = await fetch(`/consulta/${id}`);
         const data = await response.json();
 
-        if (data.id) {
+        if (data && data.id && modal) {
             document.getElementById('modal-ave-nombre').textContent = data.ave_nombre;
             document.getElementById('modal-voluntario').textContent = data.voluntario_nombre;
             document.getElementById('modal-fecha').textContent = data.fecha_hora;
             document.getElementById('modal-ubicacion').textContent = ` ${data.comuna_nombre}, ${data.region_nombre}`;
-            document.getElementById('modal-descripcion').textContent = data.descripcion;
+            document.getElementById('modal-descripcion').textContent = data.descripcion || '';
 
             const modalArchivos = document.getElementById('modal-galeria');
             modalArchivos.innerHTML = '';
 
             if (data.archivos && data.archivos.length > 0) {
                 data.archivos.forEach(archivo => {
-                    const rutaLimpia = archivo.ruta_archivo.replace(/^\/+|\/+$/g, '');
-                    const rutaArchivo = `/static/${rutaLimpia}/${archivo.nombre_archivo}`;
-                    const ext = archivo.nombre_archivo.split('.').pop().toLowerCase();
+                    const nombreArchivo = (archivo.nombre_archivo || '').replace(/^\/+/, '');
+                    const carpetaLimpia = (archivo.ruta_archivo || '').replace(/^\/+|\/+$/g, '').replace(/^static\/?/i, '').replace(/^uploads\/?/i, '');
+                    const rutaArchivo = carpetaLimpia? `/uploads/${carpetaLimpia}/${nombreArchivo}`: `/uploads/${nombreArchivo}`;
+                    const ext = (archivo.nombre_archivo || '').split('.').pop().toLowerCase();
 
                     if(['mp4', 'mov'].includes(ext)) {
                         let video = document.createElement('video');
@@ -137,8 +181,9 @@ const abrirDetalleAvistamiento = async (id) => {
             }
 
             renderizarComentarios(data.comentarios);
-            document.getElementById('form-comentario').reset();
-            document.getElementById('mensaje-comentario-resultado').textContent = '';
+            if (formComentario) formComentario.reset();
+            const resultadoMsg = document.getElementById('mensaje-comentario-resultado');
+            if (resultadoMsg) resultadoMsg.textContent = '';
 
             modal.style.display = 'flex';
         }
@@ -149,6 +194,7 @@ const abrirDetalleAvistamiento = async (id) => {
 
 const renderizarComentarios = (comentarios) => {
     const contenedorComentarios = document.getElementById('modal-lista-comentarios');
+    if (!contenedorComentarios) return;
     contenedorComentarios.innerHTML = '';
 
     if (comentarios && comentarios.length > 0) {
@@ -158,7 +204,11 @@ const renderizarComentarios = (comentarios) => {
             
             let pComentario = document.createElement('p');
             pComentario.className = 'comentario-meta';
-            pComentario.innerHTML = `<strong>${comentario.nombre}</strong> - ${comentario.fecha}`;
+
+            let strong = document.createElement('strong');
+            strong.textContent = comentario.nombre;
+            pComentario.appendChild(strong);
+            pComentario.appendChild(document.createTextNode(` - ${comentario.fecha}`));
 
             let pTexto = document.createElement('p');
             pTexto.className = 'comentario-texto';
@@ -173,75 +223,86 @@ const renderizarComentarios = (comentarios) => {
     }
 };
 
-document.getElementById('form-comentario').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nombre = document.getElementById('comentarista-nombre').value.trim();
-    const texto = document.getElementById('comentario-texto').value.trim();
-    const resultadoMensaje = document.getElementById('mensaje-comentario-resultado');
+if (formComentario) {
+    formComentario.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nombre = document.getElementById('comentarista-nombre').value.trim();
+        const texto = document.getElementById('comentario-texto').value.trim();
+        const resultadoMensaje = document.getElementById('mensaje-comentario-resultado');
 
-    if (nombre.length < 3 || nombre.length > 50) {
-        resultadoMensaje.textContent = 'El nombre debe tener entre 3 y 50 caracteres.';
-        return;
-    }
-
-    if (texto.length < 5) {
-        resultadoMensaje.textContent = 'El comentario debe tener al menos 5 caracteres.';
-        return;
-    }
-
-    try {
-        const response = await fetch(`/consulta/${avistamientoActual}/comentario`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, texto })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            resultadoMensaje.textContent = data.message;
-            document.getElementById('form-comentario').reset();
-
-            abrirDetalleAvistamiento(avistamientoActual);
-        } else {
-            resultadoMensaje.textContent = `Error: ${data.message}`;
+        if (nombre.length < 3 || nombre.length > 50) {
+            resultadoMensaje.textContent = 'El nombre debe tener entre 3 y 50 caracteres.';
+            return;
         }
-    } catch (error) {
-        console.error('Error al enviar el comentario:', error);
-        resultadoMensaje.textContent = 'Ocurrió un error al enviar el comentario.';
-    }
-});
 
-btnCerrarModal.onclick = () => {
-    modal.style.display = 'none';
-};
+        if (texto.length < 5) {
+            resultadoMensaje.textContent = 'El comentario debe tener al menos 5 caracteres.';
+            return;
+        }
 
-window.onclick = (event) => { 
-    if (event.target === modal) { 
-        modal.style.display = 'none'; 
-    } 
-};
+        try {
+            const response = await fetch(`/consulta/${avistamientoActual}/comentario`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, texto })
+            });
 
-filtroAveInput.addEventListener('input', () => {
-    paginaActual = 1;
-    renderizarTabla();
-});
+            const data = await response.json();
 
-ordenarPorSelect.addEventListener('change', () => {
-    renderizarTabla();
-});
+            if (data.success) {
+                resultadoMensaje.textContent = data.message;
+                formComentario.reset();
+                abrirDetalleAvistamiento(avistamientoActual);
+            } else {
+                resultadoMensaje.textContent = `Error: ${data.message}`;
+            }
+        } catch (error) {
+            console.error('Error al enviar el comentario:', error);
+            resultadoMensaje.textContent = 'Ocurrió un error al enviar el comentario.';
+        }
+    });
+}
 
-btnAnterior.addEventListener('click', () => {
-    if (paginaActual > 1) {
-        paginaActual--;
+if (busquedaInput) {
+    busquedaInput.addEventListener('input', () => {
+        paginaActual = 1;
         renderizarTabla();
+    });
+}
+
+if (btnCerrarModal && modal) {
+    btnCerrarModal.onclick = () => {
+        modal.style.display = 'none';
+    };
+}
+
+window.addEventListener('click', (event) => {
+    if (modal && event.target === modal) {
+        modal.style.display = 'none';
     }
 });
 
-btnSiguiente.addEventListener('click', () => {
-    paginaActual++;
-    renderizarTabla();
-});
+if (ordenarPorSelect) {
+    ordenarPorSelect.addEventListener('change', () => {
+        renderizarTabla();
+    });
+}
+
+if (btnAnterior) {
+    btnAnterior.addEventListener('click', () => {
+        if (paginaActual > 1) {
+            paginaActual--;
+            renderizarTabla();
+        }
+    });
+}
+
+if (btnSiguiente) {
+    btnSiguiente.addEventListener('click', () => {
+        paginaActual++;
+        renderizarTabla();
+    });
+}
 
 // Carga inicial
 renderizarTabla();
