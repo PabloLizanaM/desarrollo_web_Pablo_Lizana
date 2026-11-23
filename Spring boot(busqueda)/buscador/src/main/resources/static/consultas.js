@@ -294,11 +294,9 @@ if (formEvaluar) {
                 itemEvaluando.nota_promedio = data.nota_promedio;
                 renderizarTabla();
                 cerrarModalEvaluar();
-            } else {
-                if (errorNota) {
+            } else if (errorNota) {
                     errorNota.textContent = data.message || 'No se pudo registrar la nota.';
                     errorNota.classList.add('visible');
-                }
             }
         } catch (error) {
             console.error('Error al evaluar avistamiento:', error);

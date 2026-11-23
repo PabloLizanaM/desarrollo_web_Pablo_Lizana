@@ -1,51 +1,55 @@
-# Sistema de Gestión de Avistamientos de Aves - Tarea 3
+# Buscador y Evaluación de Avistamientos de Aves - Tarea 4
 
 **Autor:** Pablo Lizana  
 **Curso:** Desarrollo Web 
 
 ## Descripción
-Aplicación web desarrollada con Python (Flask) y MySQL para la gestión de voluntarios, reporte de avistamientos de aves, visualización de estadísticas gráficas y sistema dinámico de comentarios para la Unión de Ornitólogos de Chile.
+Aplicación web desarrollada con **Java (17+)**, **Spring Boot**, **Spring Data JPA** y **MySQL** para la consulta en tiempo real, visualización detallada y evaluación mediante notas de avistamientos de aves para la Unión de Ornitólogos de Chile
 
 ---
 
-### 1. Arquitectura y Persistencia (Flask-SQLAlchemy + PyMySQL)
-* **Conexión e Integración:** Se utilizó **Flask-SQLAlchemy** junto con la extensión `pymysql` para administrar las sesiones y transacciones con la base de datos MySQL.
-* **Consultas Parametrizadas:** Las consultas SQL se ejecutan mediante objetos `text()` de SQLAlchemy parametrizados (`:id`, `:nombre`, etc.), garantizando una separación clara de la lógica y previniendo vulnerabilidades de inyección SQL (SQLi).
-* **Manejo de Fechas:** Las fechas de registro de usuarios, avistamientos y comentarios son procesadas dinámicamente mediante `datetime.now()` e insertadas con el formato estándar `YYYY-MM-DD HH:MM:SS`.
+### 1. Arquitectura y Persistencia (Spring Boot + Spring Data JPA)
+* **Conexión e Integración:** Se utilizó **Spring Boot** junto con **Spring Data JPA (Hibernate)** y el conector de **MySQL** para gestionar el mapeo objeto-relacional y las transacciones con la base de datos.
+* **Consultas JPQL y Carga Eficiente:** Las consultas hacia entidades relacionadas (`Avistamiento`, `Ave`, `Voluntario`, `Comuna`, `Region`, `Registro`, `Comentario` y `Nota`) se resuelven mediante repositorios JPA (`JOIN FETCH` y agregaciones `AVG`), evitando consultas innecesarias y previniendo inyección SQL.
+* **Manejo de Fechas:** Las fechas de avistamientos y comentarios se gestionan mediante `java.time.LocalDateTime` y se formatean de manera uniforme (`yyyy-MM-dd HH:mm`) para su visualización en la interfaz.
 
-### 2. Carga y Servido de Archivos Multimedia (Uploads)
-* **Procesamiento de Archivos:** Los archivos multimedia subidos en el reporte de avistamiento se sanitizan mediante `secure_filename` de Werkzeug y se renombran agregando un *timestamp* para garantizar nombres únicos y evitar colisiones en el servidor.
-* **Almacenamiento Físico y BD:** Los archivos se guardan físicamente en el directorio `static/uploads/`. En la tabla `registro` de la base de datos se almacena la ruta relativa `uploads/` y el nombre asignado al archivo.
-* **Carga Dinámica en Modal:** En el historial de consultas, al hacer clic en una fila, JavaScript realiza una petición asíncrona (`fetch`) al endpoint `/consulta/<id>`, el cual retorna la lista completa de evidencias y comentarios asociados.
+### 2. Buscador en Tiempo Real y Resaltado de Coincidencias
+* **Filtrado Instantáneo:** La vista `/consultas` presenta un formulario con un campo de texto (`#busqueda-avistamiento`) que filtra dinámicamente los avistamientos a medida que el usuario escribe, buscando coincidencias por **especie de ave**, **nombre del voluntario** o **comuna**.
+* **Resaltado Dinámico (`<mark>`):** Los fragmentos de texto que calzan con el patrón buscado se destacan visualmente mediante etiquetas `<mark>` generadas de forma segura en el DOM, mostrando además un mensaje informativo cuando no existen coincidencias.
+* **Ordenamiento y Paginación:** Permite ordenar los resultados por fecha, comuna o especie y navegar por páginas sin recargar la vista.
 
-### 3. Módulo de Estadísticas y Gráficos (Chart.js)
-* **Gráficos Dinámicos:** La pantalla de métricas implementa tres gráficos utilizando la librería Chart.js con llamadas asíncronas (`fetch`) hacia endpoints del servidor:
-  1. **Gráfico de Líneas:** Muestra la cantidad de avistamientos registrados por día.
-  2. **Gráfico de Torta:** Muestra el total de avistamientos agrupados por tipo de ave.
-  3. **Gráfico de Barras:** Despliega el total de voluntarios registrados por comuna en el eje X y las cantidades en el eje Y.
-* **Navegación:** Cuenta con un enlace al pie de la página para retornar de forma sencilla a la portada del sistema.
+### 3. Sistema de Evaluación de Avistamientos (`Nota`)
+* **Visualización de Nota Promedio:** Cada fila de resultados incluye la columna **Nota**, mostrando `"-"` cuando el avistamiento aún no registra evaluaciones o el promedio calculado redondeado a un decimal en caso contrario.
+* **Modal de Evaluación y Validación (1 a 7):** Al hacer clic en el botón **Evaluar**, se despliega un modal interactivo (`#modal-evaluar`) que solicita ingresar una nota entera entre `1` y `7` (ambos inclusive), validando el rango y tipo numérico tanto en el cliente como en el servidor.
+* **Persistencia y Actualización Asíncrona:** Al confirmar la evaluación, JavaScript envía una petición `POST` asíncrona (`fetch`) al endpoint `/consulta/{id}/nota`, guarda el registro en la tabla `nota` (`id`, `avistamiento_id`, `nota`), recalcula el promedio en la base de datos y actualiza inmediatamente la tabla en pantalla.
 
-### 4. Sistema de Comentarios Asociados
-* **Formulario Interactivo:** Al visualizar el detalle de cualquier avistamiento mediante el modal, se despliega un formulario interactivo con validaciones de longitud (nombre entre 3 y 50 caracteres, y texto del comentario de mínimo 5 caracteres en un área de texto de 3x40).
-* **Listado y Envío Asíncrono:** Los comentarios se listan mostrando la fecha, el nombre del comentarista y el texto. Al enviar el formulario, se realiza una petición `POST` asíncrona (`fetch`) validando los datos tanto en el cliente como en el servidor antes de insertarlos en la tabla `comentario`.
+### 4. Modal de Detalle, Multimedia y Comentarios Asociados
+* **Carga Dinámica en Modal:** Al hacer clic sobre una fila del listado, JavaScript realiza una petición asíncrona (`fetch`) al endpoint `GET /consulta/{id}`, desplegando la ficha completa del avistamiento, sus archivos adjuntos y comentarios asociados.
+* **Servido Portable de Archivos (`/uploads/**`):** Mediante `WebConfig`, la aplicación resuelve dinámicamente el directorio de evidencias multimedia de forma independiente de rutas absolutas del sistema operativo.
 
-### 5. Validaciones y Seguridad
-* **Doble Validación:** Todos los datos recibidos en formularios cuentan con validaciones exhaustivas tanto en el cliente como en el servidor.
-* **Prevención de XSS (Cross-Site Scripting):** 
-  - Las plantillas HTML hacen uso del renderizado con auto-escape nativo de Jinja2 (`{{ ... }}`).
-  - En la interacción dinámica con el DOM (`consultas.js`), los datos de comentarios y descripciones recibidos del servidor se asignan estrictamente mediante la propiedad `.textContent`, impidiendo la ejecución de scripts maliciosos.
+### 5. Validaciones, Seguridad y Estándares Web
+* **Doble Validación:** Tanto los comentarios como las notas cuentan con validación en el navegador (`consultas.js`) y en el backend (`ConsultaController`).
+* **Prevención de XSS (Cross-Site Scripting):**
+  - Las plantillas utilizan el escape nativo de **Thymeleaf** (`th:text`, `th:inline="javascript"`).
+  - En la manipulación del DOM (`consultas.js`), los textos provenientes del servidor y las búsquedas del usuario se insertan estrictamente mediante `.textContent` y `document.createTextNode`, evitando la ejecución de código malicioso.
 
 ---
 
 ## Estructura del Repositorio
 
-* `app.py` - Servidor principal de Flask, configuración de BD, definición de rutas y endpoints de API.
-* `templates/` - Plantillas HTML dinámicas con motor Jinja2 (`index.html`, `registro.html`, `avistamiento.html`, `consultas.html`, `metricas.html`).
-* `static/`
-  * `css/style.css` - Estilos generales, diseño adaptable y estructuración de componentes.
-  * `js/` - Scripts para validaciones y comportamiento interactivo (`registro.js`, `avistamiento.js`, `consultas.js`, `metricas.js`).
-  * `uploads/` - Directorio reservado para los archivos multimedia subidos por los usuarios.
-* `README.md` - Documentación de entrega para la Tarea 3.
+* `Flask(app web)/` - Aplicación web base desarrollada previamente en Flask.
+* `Spring boot(busqueda)/buscador/` - Proyecto Spring Boot con JPA y `fetch`:
+  * `src/main/java/proyecto/tarea4/buscador/`
+    * `config/WebConfig.java` - Configuración portable para servir archivos multimedia desde `/uploads/**`.
+    * `controller/ConsultaController.java` - Controlador MVC y endpoints REST (`GET /consultas`, `GET /consulta/{id}`, `POST /consulta/{id}/comentario`, `POST /consulta/{id}/nota`).
+    * `model/` - Entidades JPA mapeadas a MySQL (`Avistamiento`, `Ave`, `Voluntario`, `Comuna`, `Region`, `Registro`, `Comentario`, `Nota`).
+    * `repository/` - Interfaces `JpaRepository` con consultas personalizadas (`AvistamientoRepository`, `RegistroRepository`, `ComentarioRepository`, `NotaRepository`).
+  * `src/main/resources/`
+    * `application.properties` - Configuración de conexión a MySQL (`tarea2`) e Hibernate.
+    * `templates/consultas.html` - Vista principal del buscador, tabla de resultados y modales de detalle y evaluación.
+    * `static/style.css` - Estilos generales, diseño adaptable, resaltado `<mark>` y modales.
+    * `static/consultas.js` - Lógica de filtrado en tiempo real, ordenamiento, paginación y llamadas asíncronas (`fetch`).
+* `README.md` - Documentación de entrega para la Tarea 4.
 
 ---
 
