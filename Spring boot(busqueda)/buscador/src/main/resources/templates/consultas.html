@@ -38,6 +38,8 @@
                         <th>Fecha y hora</th>
                         <th>Comuna</th>
                         <th>Evidencia</th>
+                        <th>Nota</th>
+                        <th>Evaluar</th>
                     </tr>
                 </thead>
                 <tbody id="cuerpo-tabla-avistamientos">
@@ -82,6 +84,25 @@
                 </div>
                 <button type="submit">Enviar Comentario</button>
                 <p id ="mensaje-comentario-resultado" class="resultado-comentario"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-evaluar" class="modal">
+        <div class="modal-contenido modal-evaluar-contenido">
+            <span class="cerrar-modal" id="cerrar-modal-evaluar">&times;</span>
+            <h2>Evaluar Avistamiento</h2>
+            <p id="evaluar-descripcion">Ingrese una nota entera entre 1 y 7:</p>
+            <form id="form-evaluar">
+                <div class="campo">
+                    <label for="input-nota">Nota (1 a 7):</label>
+                    <input type="number" id="input-nota" min="1" max="7" step="1" placeholder="Ej: 6" required>
+                    <small id="error-nota" class="mensaje-error">Debe ingresar un número entero entre 1 y 7, ambos inclusive.</small>
+                </div>
+                <div class="acciones-evaluar">
+                    <button type="button" id="btn-cancelar-evaluar" class="btn-secundario">Cancelar</button>
+                    <button type="submit">Guardar Nota</button>
+                </div>
             </form>
         </div>
     </div>

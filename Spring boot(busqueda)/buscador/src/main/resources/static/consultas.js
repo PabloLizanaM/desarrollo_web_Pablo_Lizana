@@ -27,6 +27,16 @@ const modal = document.getElementById('modal-detalle');
 const btnCerrarModal = document.getElementById('cerrar-modal');
 const formComentario = document.getElementById('form-comentario');
 
+const modalEvaluar = document.getElementById('modal-evaluar');
+const btnCerrarModalEvaluar = document.getElementById('cerrar-modal-evaluar');
+const btnCancelarEvaluar = document.getElementById('btn-cancelar-evaluar');
+const formEvaluar = document.getElementById('form-evaluar');
+const inputNota = document.getElementById('input-nota');
+const errorNota = document.getElementById('error-nota');
+const evaluarDescripcion = document.getElementById('evaluar-descripcion');
+
+let itemEvaluando = null;
+
 const escaparRegex = (texto) => texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const crearCeldaConResaltado = (textoOriginal, patron) => {
@@ -102,7 +112,7 @@ const renderizarTabla = () => {
     if (datosPaginados.length === 0) {
         let filaVacia = document.createElement('tr');
         let celdaVacia = document.createElement('td');
-        celdaVacia.colSpan = 5;
+        celdaVacia.colSpan = 7;
         celdaVacia.style.textAlign = 'center';
         celdaVacia.textContent = patronOriginal ? `No se encontraron avistamientos que coincidan con "${patronOriginal}".` : 'No hay avistamientos registrados.';
         filaVacia.appendChild(celdaVacia);
@@ -113,22 +123,35 @@ const renderizarTabla = () => {
             tr.className = 'fila-avistamiento';
             tr.onclick = () => abrirDetalleAvistamiento(item.id);
 
-            const tdAve = crearCeldaConResaltado(item.ave_nombre, patronOriginal);
-            const tdVoluntario = crearCeldaConResaltado(item.voluntario_nombre, patronOriginal);
+            let tdAve = crearCeldaConResaltado(item.ave_nombre, patronOriginal);
+            let tdVoluntario = crearCeldaConResaltado(item.voluntario_nombre, patronOriginal);
 
             let tdFecha = document.createElement('td');
             tdFecha.textContent = item.fecha_hora || obtenerDia(item.fecha_hora);
 
-            const tdComuna = crearCeldaConResaltado(item.comuna_nombre, patronOriginal);
+            let tdComuna = crearCeldaConResaltado(item.comuna_nombre, patronOriginal);
 
             let tdArchivo = document.createElement('td');
             tdArchivo.textContent = `${item.cantidad_archivos ?? 0} archivo(s)`;
+
+            let tdNota = document.createElement('td');
+            tdNota.textContent = (item.nota_promedio !== null && item.nota_promedio !== undefined) ? Number(item.nota_promedio).toFixed(1): '-';
+
+            let tdEvaluar = document.createElement('td');
+            let btnEvaluar = document.createElement('button');
+            btnEvaluar.type = 'button';
+            btnEvaluar.className = 'btn-evaluar';
+            btnEvaluar.textContent = 'Evaluar';
+            btnEvaluar.onclick = (e) => evaluarAvistamiento(item, e);
+            tdEvaluar.appendChild(btnEvaluar);
 
             tr.appendChild(tdAve);
             tr.appendChild(tdVoluntario);
             tr.appendChild(tdFecha);
             tr.appendChild(tdComuna);
             tr.appendChild(tdArchivo);
+            tr.appendChild(tdNota);
+            tr.appendChild(tdEvaluar);
 
             cuerpoTabla.appendChild(tr);
         });
@@ -223,6 +246,70 @@ const renderizarComentarios = (comentarios) => {
     }
 };
 
+const cerrarModalEvaluar = () => {
+    if (modalEvaluar) modalEvaluar.style.display = 'none';
+    if (formEvaluar) formEvaluar.reset();
+    if (errorNota) errorNota.classList.remove('visible');
+    itemEvaluando = null;
+};
+
+const evaluarAvistamiento = (item, event) => {
+    if (event) event.stopPropagation();
+    itemEvaluando = item;
+    if (evaluarDescripcion) {
+        evaluarDescripcion.textContent = `Ingrese una nota entera entre 1 y 7 para "${item.ave_nombre}":`;
+    }
+    if (errorNota) errorNota.classList.remove('visible');
+    if (inputNota) {
+        inputNota.value = '';
+        modalEvaluar.style.display = 'flex';
+        inputNota.focus();
+    }
+};
+
+if (formEvaluar) {
+    formEvaluar.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!itemEvaluando || !inputNota) return;
+
+        const raw = inputNota.value.trim();
+        const notaNum = Number(raw);
+
+        if (!raw || !Number.isInteger(notaNum) || notaNum < 1 || notaNum > 7) {
+            if (errorNota) errorNota.classList.add('visible');
+            return;
+        }
+
+        if (errorNota) errorNota.classList.remove('visible');
+
+        try {
+            const response = await fetch(`/consulta/${itemEvaluando.id}/nota`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nota: notaNum })
+            });
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                itemEvaluando.nota_promedio = data.nota_promedio;
+                renderizarTabla();
+                cerrarModalEvaluar();
+            } else {
+                if (errorNota) {
+                    errorNota.textContent = data.message || 'No se pudo registrar la nota.';
+                    errorNota.classList.add('visible');
+                }
+            }
+        } catch (error) {
+            console.error('Error al evaluar avistamiento:', error);
+            if (errorNota) {
+                errorNota.textContent = 'Error de conexión al guardar la nota.';
+                errorNota.classList.add('visible');
+            }
+        }
+    });
+}
+
 if (formComentario) {
     formComentario.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -275,6 +362,15 @@ if (btnCerrarModal && modal) {
         modal.style.display = 'none';
     };
 }
+
+if (btnCerrarModalEvaluar) btnCerrarModalEvaluar.onclick = cerrarModalEvaluar;
+if (btnCancelarEvaluar) btnCancelarEvaluar.onclick = cerrarModalEvaluar;
+
+window.addEventListener('click', (event) => {
+    if (modalEvaluar && event.target === modalEvaluar) {
+        cerrarModalEvaluar();
+    }
+});
 
 window.addEventListener('click', (event) => {
     if (modal && event.target === modal) {

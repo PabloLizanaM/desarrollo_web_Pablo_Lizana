@@ -10,9 +10,8 @@ public class Nota {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "avistamiento_id", nullable = false)
-    private Avistamiento avistamiento;
+    @Column(name = "avistamiento_id", nullable = false)
+    private Integer avistamientoId;
 
     @Column(name = "nota", nullable = false)
     private Integer nota;
@@ -25,12 +24,12 @@ public class Nota {
         this.id = id;
     }
 
-    public Avistamiento getAvistamiento() {
-        return avistamiento;
+    public Integer getAvistamiento() {
+        return avistamientoId;
     }
 
-    public void setAvistamiento(Avistamiento avistamiento) {
-        this.avistamiento = avistamiento;
+    public void setAvistamiento(Integer avistamientoId) {
+        this.avistamientoId = avistamientoId;
     }
 
     public Integer getNota() {

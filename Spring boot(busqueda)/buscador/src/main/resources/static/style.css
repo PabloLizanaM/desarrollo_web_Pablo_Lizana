@@ -395,6 +395,10 @@ textarea:focus {
     color: #2c3e50;
 }
 
+.main-consultas {
+    max-width: 980px;
+}
+
 /* Estilos para el panel de Métricas */
 .main-metricas {
     max-width: 900px;
@@ -600,6 +604,54 @@ mark {
     background-color: #f8fafc;
     color: #2c3e50;
     font-weight: 700;
+}
+
+.modal-evaluar-contenido {
+    max-width: 400px;
+}
+
+.acciones-evaluar {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.acciones-evaluar button[type="submit"] {
+    flex: 1;
+}
+
+.btn-secundario {
+    flex: 1;
+    padding: 0.85rem;
+    background-color: #e2e8f0;
+    color: #1e293b;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-secundario:hover {
+    background-color: #cbd5e1;
+}
+
+.btn-evaluar {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 0.4rem 0.85rem;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+}
+
+.btn-evaluar:hover {
+    background-color: #1d4ed8;
 }
 
 /* Hecho con Gemini */

@@ -36,7 +36,7 @@ public class Avistamiento {
     @OneToMany(mappedBy = "avistamiento", fetch = FetchType.LAZY)
     private List<Comentario> comentarios = new ArrayList<>();
 
-    @OneToMany(mappedBy = "avistamiento", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "avistamientoId", fetch = FetchType.LAZY)
     private List<Nota> notas = new ArrayList<>();
 
     public Integer getId() {
